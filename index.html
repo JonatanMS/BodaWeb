@@ -1,12 +1,18 @@
 <!doctype html>
 <html lang="es">
 <head>
+  <!-- META BÁSICO -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>J & V — Nuestra Boda · 11 Jul 2026</title>
-  <meta name="description" content="Acompáñanos en nuestra boda. Toca el moño para abrir la invitación." />
+  <title>J & V — Invitación de Boda</title>
+  <meta name="description" content="Toca el moño para abrir la invitación ✨" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400&display=swap" rel="stylesheet">
+  <!-- Open Graph -->
+  <meta property="og:title" content="J & V — Invitación de Boda" />
+  <meta property="og:description" content="Toca el moño para abrir la invitación ✨" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/preview.jpeg" />
+
   <style>
     body {
       margin: 0;
@@ -20,36 +26,59 @@
       height: 100vh;
       text-align: center;
     }
+
     h1 {
       font-family: "Playfair Display", serif;
       font-size: 3rem;
       color: goldenrod;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
+
+    .text {
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      color: #444;
+      margin-bottom: 1.5rem;
+    }
+
     .bow {
       width: 300px;
       cursor: pointer;
       transition: transform 0.6s ease;
     }
+
     .bow:hover {
       transform: scale(1.05);
     }
-    .text {
-      font-size: 1rem;
-      letter-spacing: 2px;
-      color: #444;
-    }
   </style>
 </head>
+
 <body>
+
   <h1>J & V</h1>
   <p class="text">TOCA EL MOÑO PARA ABRIR</p>
-<img src="assets/bow-white.jpeg" alt="Moño" class="bow" id="bow">
+
+  <img
+    src="assets/bow-white.jpeg"
+    alt="Moño"
+    class="bow"
+    id="bow"
+  />
+
+  <!-- AUDIO -->
+  <audio id="bg-music" preload="auto">
+    <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
+    Tu navegador no soporta audio.
+  </audio>
 
   <script>
-    function openInvite() {
-      alert("✨ Aquí se abrirá la invitación completa ✨");
-    }
+    const bow = document.getElementById("bow");
+    const music = document.getElementById("bg-music");
+
+    bow.addEventListener("click", () => {
+      music.play();
+    });
   </script>
+
 </body>
 </html>
