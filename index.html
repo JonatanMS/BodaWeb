@@ -4,103 +4,94 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>J & V — Invitación de Boda</title>
-  <meta name="description" content="Toca el moño para abrir la invitación" />
+  <meta name="description" content="Invitación de boda J & V" />
 
   <meta property="og:title" content="J & V — Invitación de Boda" />
-  <meta property="og:description" content="Toca el moño para abrir la invitación" />
+  <meta property="og:description" content="Invitación de boda J & V" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/preview.jpeg" />
 
   <style>
     :root{
-      /* MODO PRUEBA: más contraste para ver burbujas y movimiento */
-      --w:#ffffff;
+      /* Paleta visible (prueba): dorados + grises */
+      --white:#ffffff;
       --gray1:#e6e6e6;
-      --gray2:#bfbfbf;
-      --gold1:#f1d18a;  /* dorado claro */
-      --gold2:#c9972b;  /* dorado fuerte */
-      --gold3:#8a6b18;  /* dorado profundo */
+      --gray2:#cfcfcf;
+      --gold1:#f1d18a;
+      --gold2:#c9972b;
       --goldText:#b8860b;
     }
 
-    * { box-sizing: border-box; }
+    *{ box-sizing:border-box; }
 
-body{
-  margin:0;
-  min-height:100vh;
-  min-height:100dvh; /* clave para móviles modernos */
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  color:#222;
-  overflow:hidden;
-  background: var(--w);
-  text-align:center;
+    body{
+      margin:0;
+      min-height:100vh;
+      min-height:100dvh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--white);
+      overflow:hidden;
+      padding:18px;
+      text-align:center;
+      color:#222;
+    }
 
-  padding: 18px; /* evita que se vea “perdido” en móvil */
-}
-
-    /* ===== FONDO DE BURBUJAS (CIRCULAR) =====
-       1) base gradient
-       2) burbujas (radial gradients) en 2 capas que se mueven distinto
-       3) brillo diagonal sutil (shimmer)
-    */
-
+    /* ===== FONDO BASE ===== */
     .bg-base{
-      position: fixed;
-      inset: 0;
-      z-index: -4;
-      background: linear-gradient(135deg, var(--w), var(--gray1), var(--gold1), var(--gray2), var(--w));
-      background-size: 300% 300%;
+      position:fixed;
+      inset:0;
+      z-index:-4;
+      background: linear-gradient(
+        135deg,
+        var(--white),
+        var(--gray1),
+        var(--gold1),
+        var(--gray2),
+        var(--white)
+      );
+      background-size:300% 300%;
       animation: baseMove 14s ease-in-out infinite;
     }
 
+    /* ===== BURBUJAS GRANDES ===== */
     .bubbles{
-      position: fixed;
-      inset: -10%;
-      z-index: -3;
+      position:fixed;
+      inset:-5%;
+      z-index:-3;
       pointer-events:none;
-      filter: blur(0px);
-      transform: translateZ(0);
-      opacity: 0.95;
-
-      /* Burbujas grandes/medianas */
       background:
-        radial-gradient(circle at 10% 20%, rgba(201,151,43,.35) 0 26%, rgba(255,255,255,0) 27%),
-        radial-gradient(circle at 28% 75%, rgba(191,191,191,.30) 0 20%, rgba(255,255,255,0) 21%),
-        radial-gradient(circle at 55% 30%, rgba(241,209,138,.30) 0 24%, rgba(255,255,255,0) 25%),
-        radial-gradient(circle at 80% 60%, rgba(201,151,43,.28) 0 18%, rgba(255,255,255,0) 19%),
-        radial-gradient(circle at 90% 15%, rgba(191,191,191,.25) 0 14%, rgba(255,255,255,0) 15%),
-        radial-gradient(circle at 65% 90%, rgba(241,209,138,.22) 0 16%, rgba(255,255,255,0) 17%);
+        radial-gradient(circle at 12% 20%, rgba(201,151,43,.45) 0 24%, rgba(255,255,255,0) 25%),
+        radial-gradient(circle at 30% 75%, rgba(207,207,207,.40) 0 20%, rgba(255,255,255,0) 21%),
+        radial-gradient(circle at 55% 30%, rgba(241,209,138,.40) 0 22%, rgba(255,255,255,0) 23%),
+        radial-gradient(circle at 80% 60%, rgba(201,151,43,.38) 0 18%, rgba(255,255,255,0) 19%),
+        radial-gradient(circle at 90% 15%, rgba(191,191,191,.35) 0 14%, rgba(255,255,255,0) 15%);
       animation: bubblesFloat 10s ease-in-out infinite alternate;
     }
 
+    /* ===== BURBUJAS PEQUEÑAS (PROFUNDIDAD) ===== */
     .bubbles2{
-      position: fixed;
-      inset: -15%;
-      z-index: -2;
+      position:fixed;
+      inset:-8%;
+      z-index:-2;
       pointer-events:none;
-      transform: translateZ(0);
-      opacity: 0.75;
-      filter: blur(1px);
-
-      /* Burbujas pequeñas (otra capa para profundidad) */
       background:
-        radial-gradient(circle at 18% 55%, rgba(201,151,43,.22) 0 10%, rgba(255,255,255,0) 11%),
-        radial-gradient(circle at 35% 40%, rgba(241,209,138,.18) 0 12%, rgba(255,255,255,0) 13%),
-        radial-gradient(circle at 48% 85%, rgba(191,191,191,.20) 0 9%,  rgba(255,255,255,0) 10%),
-        radial-gradient(circle at 70% 22%, rgba(201,151,43,.18) 0 11%, rgba(255,255,255,0) 12%),
-        radial-gradient(circle at 78% 78%, rgba(241,209,138,.16) 0 10%, rgba(255,255,255,0) 11%),
-        radial-gradient(circle at 92% 45%, rgba(191,191,191,.18) 0 8%,  rgba(255,255,255,0) 9%);
+        radial-gradient(circle at 18% 55%, rgba(201,151,43,.30) 0 10%, rgba(255,255,255,0) 11%),
+        radial-gradient(circle at 35% 40%, rgba(241,209,138,.26) 0 12%, rgba(255,255,255,0) 13%),
+        radial-gradient(circle at 48% 85%, rgba(191,191,191,.28) 0 9%, rgba(255,255,255,0) 10%),
+        radial-gradient(circle at 70% 22%, rgba(201,151,43,.25) 0 11%, rgba(255,255,255,0) 12%),
+        radial-gradient(circle at 85% 70%, rgba(241,209,138,.24) 0 10%, rgba(255,255,255,0) 11%);
       animation: bubblesFloat2 7.5s ease-in-out infinite alternate;
-      mix-blend-mode: multiply;
+      mix-blend-mode:multiply;
     }
 
+    /* ===== BRILLO SUAVE ===== */
     .shimmer{
-      position: fixed;
-      inset: -35%;
-      z-index: -1;
+      position:fixed;
+      inset:-25%;
+      z-index:-1;
       pointer-events:none;
       background: linear-gradient(
         115deg,
@@ -109,120 +100,84 @@ body{
         rgba(255,255,255,0) 60%
       );
       filter: blur(10px);
-      opacity: .55;
+      opacity:.5;
       animation: shimmerMove 7s ease-in-out infinite;
-      transform: translateZ(0);
     }
 
-    @keyframes baseMove {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes baseMove{
+      0%{ background-position:0% 50%; }
+      50%{ background-position:100% 50%; }
+      100%{ background-position:0% 50%; }
     }
-
-    @keyframes bubblesFloat {
-      0%   { transform: translate(-2%, -1%) scale(1.00); }
-      100% { transform: translate(2%,  1.5%) scale(1.05); }
+    @keyframes bubblesFloat{
+      0%{ transform:translate(-2%, -1%) scale(1); }
+      100%{ transform:translate(2%, 1.5%) scale(1.05); }
     }
-
-    @keyframes bubblesFloat2 {
-      0%   { transform: translate(2%, 1.5%) scale(1.02); }
-      100% { transform: translate(-2%, -1%) scale(1.08); }
+    @keyframes bubblesFloat2{
+      0%{ transform:translate(2%, 1.5%) scale(1.02); }
+      100%{ transform:translate(-2%, -1%) scale(1.08); }
     }
-
     @keyframes shimmerMove{
-      0%   { transform: translateX(-45%) translateY(-10%) rotate(6deg); }
-      50%  { transform: translateX(10%)  translateY(8%)  rotate(6deg); }
-      100% { transform: translateX(50%)  translateY(-8%) rotate(6deg); }
+      0%{ transform:translateX(-40%) rotate(6deg); }
+      50%{ transform:translateX(10%) rotate(6deg); }
+      100%{ transform:translateX(45%) rotate(6deg); }
     }
 
-    /* ===== CONTENIDO ===== */
+    /* ===== TARJETA ===== */
     .card{
-      padding: 22px 28px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.72);
+      width:min(520px, 100%);
+      padding:22px 28px;
+      border-radius:18px;
+      background: rgba(255,255,255,.75);
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(201,151,43,.45);
-      box-shadow: 0 20px 45px rgba(0,0,0,.14);
+      border:1px solid rgba(201,151,43,.45);
+      box-shadow:0 20px 45px rgba(0,0,0,.14);
     }
 
     h1{
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 3rem;
-      color: var(--goldText);
-      margin: 0 0 .5rem 0;
+      font-family: "Playfair Display", Georgia, serif;
+      font-size:3rem;
+      color:var(--goldText);
+      margin:0 0 .5rem 0;
     }
 
     .text{
-      font-size: .9rem;
-      letter-spacing: 2px;
-      color:#333;
-      margin: 0 0 1.5rem 0;
+      font-size:.95rem;
+      letter-spacing:2px;
+      color:#444;
+      margin:0 0 1.5rem 0;
     }
 
     .bow{
-      width:300px;
-      max-width:80vw;
+      width:min(340px, 92vw);
       cursor:pointer;
-      transition: transform .25s ease;
       user-select:none;
       -webkit-user-drag:none;
+      transition:transform .3s ease;
     }
-    .bow:active{ transform: scale(0.97); }
 
-    .status{
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color:#444;
-      min-height: 1.2em;
-    }
+    .bow:hover{ transform:scale(1.05); }
 
     @media (prefers-reduced-motion: reduce){
-      .bg-base, .bubbles, .bubbles2, .shimmer { animation:none !important; }
+      .bg-base, .bubbles, .bubbles2, .shimmer{ animation:none; }
     }
   </style>
 </head>
 
 <body>
-  <!-- Fondo circular/burbujas -->
+
+  <!-- Fondo -->
   <div class="bg-base"></div>
   <div class="bubbles"></div>
   <div class="bubbles2"></div>
   <div class="shimmer"></div>
 
-  <!-- Contenido -->
+  <!-- Invitación -->
   <div class="card">
     <h1>J & V</h1>
-    <p class="text">TOCA EL MOÑO PARA ABRIR</p>
-
-    <img src="assets/bow-white.jpeg" alt="Moño" class="bow" id="bow" />
-    <div class="status" id="status"></div>
+    <p class="text">BIENVENIDOS A NUESTRA INVITACIÓN</p>
+    <img src="assets/bow-white.jpeg" alt="Moño" class="bow" />
   </div>
 
-  <!-- AUDIO -->
-  <audio id="bg-music" preload="auto">
-    <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
-    Tu navegador no soporta audio.
-  </audio>
-
-  <!-- Script único (sin duplicados) -->
-  <script>
-    const bow = document.getElementById("bow");
-    const music = document.getElementById("bg-music");
-    const statusEl = document.getElementById("status");
-
-    bow.addEventListener("click", async () => {
-      try {
-        if (!music.paused) return; // no reiniciar si ya suena
-        await music.play();
-        statusEl.textContent = "Música activada";
-      } catch (e) {
-        statusEl.textContent = "No se pudo reproducir. Revisa el archivo en /assets.";
-        console.error(e);
-      }
-    });
-  </script>
 </body>
 </html>
-
