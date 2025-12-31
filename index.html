@@ -13,14 +13,14 @@
 
   <style>
     :root{
-      /* MODO PRUEBA: colores más fuertes para ver movimiento */
+      /* MODO PRUEBA: más contraste para ver burbujas y movimiento */
       --w:#ffffff;
       --gray1:#e6e6e6;
       --gray2:#bfbfbf;
       --gold1:#f1d18a;  /* dorado claro */
-      --gold2:#c9972b;  /* dorado más fuerte */
+      --gold2:#c9972b;  /* dorado fuerte */
       --gold3:#8a6b18;  /* dorado profundo */
-      --goldText: #b8860b; /* goldenrod más serio */
+      --goldText:#b8860b;
     }
 
     * { box-sizing: border-box; }
@@ -38,60 +38,95 @@
       text-align:center;
     }
 
-    /* ===== FONDO “TELA/OLAS” (MÁS VISIBLE) ===== */
-    .bg{
-      position:fixed;
-      inset:-25%;
-      z-index:-3;
-      background:
-        radial-gradient(70% 75% at 18% 22%, rgba(241,209,138,.80), rgba(255,255,255,0) 60%),
-        radial-gradient(80% 75% at 82% 30%, rgba(191,191,191,.75), rgba(255,255,255,0) 62%),
-        radial-gradient(85% 85% at 50% 82%, rgba(201,151,43,.65), rgba(255,255,255,0) 60%),
-        linear-gradient(120deg, var(--w), var(--gray1), var(--gold1), var(--gray2), var(--gold2), var(--w));
-      filter: blur(8px);
-      animation: drift 10s ease-in-out infinite alternate;
-      transform: translateZ(0);
+    /* ===== FONDO DE BURBUJAS (CIRCULAR) =====
+       1) base gradient
+       2) burbujas (radial gradients) en 2 capas que se mueven distinto
+       3) brillo diagonal sutil (shimmer)
+    */
+
+    .bg-base{
+      position: fixed;
+      inset: 0;
+      z-index: -4;
+      background: linear-gradient(135deg, var(--w), var(--gray1), var(--gold1), var(--gray2), var(--w));
+      background-size: 300% 300%;
+      animation: baseMove 14s ease-in-out infinite;
     }
 
-    .bg2{
-      position:fixed;
-      inset:-30%;
-      z-index:-2;
-      background:
-        radial-gradient(55% 60% at 28% 52%, rgba(201,151,43,.70), rgba(255,255,255,0) 65%),
-        radial-gradient(60% 65% at 72% 58%, rgba(138,107,24,.50), rgba(255,255,255,0) 68%);
-      filter: blur(12px);
-      opacity:.95;
-      animation: drift2 8s ease-in-out infinite alternate;
+    .bubbles{
+      position: fixed;
+      inset: -10%;
+      z-index: -3;
+      pointer-events:none;
+      filter: blur(0px);
       transform: translateZ(0);
+      opacity: 0.95;
+
+      /* Burbujas grandes/medianas */
+      background:
+        radial-gradient(circle at 10% 20%, rgba(201,151,43,.35) 0 26%, rgba(255,255,255,0) 27%),
+        radial-gradient(circle at 28% 75%, rgba(191,191,191,.30) 0 20%, rgba(255,255,255,0) 21%),
+        radial-gradient(circle at 55% 30%, rgba(241,209,138,.30) 0 24%, rgba(255,255,255,0) 25%),
+        radial-gradient(circle at 80% 60%, rgba(201,151,43,.28) 0 18%, rgba(255,255,255,0) 19%),
+        radial-gradient(circle at 90% 15%, rgba(191,191,191,.25) 0 14%, rgba(255,255,255,0) 15%),
+        radial-gradient(circle at 65% 90%, rgba(241,209,138,.22) 0 16%, rgba(255,255,255,0) 17%);
+      animation: bubblesFloat 10s ease-in-out infinite alternate;
+    }
+
+    .bubbles2{
+      position: fixed;
+      inset: -15%;
+      z-index: -2;
+      pointer-events:none;
+      transform: translateZ(0);
+      opacity: 0.75;
+      filter: blur(1px);
+
+      /* Burbujas pequeñas (otra capa para profundidad) */
+      background:
+        radial-gradient(circle at 18% 55%, rgba(201,151,43,.22) 0 10%, rgba(255,255,255,0) 11%),
+        radial-gradient(circle at 35% 40%, rgba(241,209,138,.18) 0 12%, rgba(255,255,255,0) 13%),
+        radial-gradient(circle at 48% 85%, rgba(191,191,191,.20) 0 9%,  rgba(255,255,255,0) 10%),
+        radial-gradient(circle at 70% 22%, rgba(201,151,43,.18) 0 11%, rgba(255,255,255,0) 12%),
+        radial-gradient(circle at 78% 78%, rgba(241,209,138,.16) 0 10%, rgba(255,255,255,0) 11%),
+        radial-gradient(circle at 92% 45%, rgba(191,191,191,.18) 0 8%,  rgba(255,255,255,0) 9%);
+      animation: bubblesFloat2 7.5s ease-in-out infinite alternate;
       mix-blend-mode: multiply;
     }
 
     .shimmer{
-      position:fixed;
-      inset:-35%;
-      z-index:-1;
+      position: fixed;
+      inset: -35%;
+      z-index: -1;
+      pointer-events:none;
       background: linear-gradient(
         115deg,
         rgba(255,255,255,0) 0%,
-        rgba(241,209,138,.95) 45%,
+        rgba(241,209,138,.65) 45%,
         rgba(255,255,255,0) 60%
       );
-      filter: blur(6px);
-      opacity:.65;
-      animation: shimmerMove 6.5s ease-in-out infinite;
-      pointer-events:none;
+      filter: blur(10px);
+      opacity: .55;
+      animation: shimmerMove 7s ease-in-out infinite;
       transform: translateZ(0);
     }
 
-    @keyframes drift{
-      0%   { transform: translate(-4%, -3%) scale(1.03) rotate(-0.6deg); }
-      100% { transform: translate(4%,  3%) scale(1.12) rotate(0.7deg); }
+    @keyframes baseMove {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
-    @keyframes drift2{
-      0%   { transform: translate(3%, 2%) scale(1.06) rotate(0.8deg); }
-      100% { transform: translate(-3%, -2%) scale(1.15) rotate(-0.8deg); }
+
+    @keyframes bubblesFloat {
+      0%   { transform: translate(-2%, -1%) scale(1.00); }
+      100% { transform: translate(2%,  1.5%) scale(1.05); }
     }
+
+    @keyframes bubblesFloat2 {
+      0%   { transform: translate(2%, 1.5%) scale(1.02); }
+      100% { transform: translate(-2%, -1%) scale(1.08); }
+    }
+
     @keyframes shimmerMove{
       0%   { transform: translateX(-45%) translateY(-10%) rotate(6deg); }
       50%  { transform: translateX(10%)  translateY(8%)  rotate(6deg); }
@@ -102,7 +137,7 @@
     .card{
       padding: 22px 28px;
       border-radius: 18px;
-      background: rgba(255,255,255,.70);
+      background: rgba(255,255,255,.72);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(201,151,43,.45);
@@ -131,10 +166,8 @@
       user-select:none;
       -webkit-user-drag:none;
     }
-
     .bow:active{ transform: scale(0.97); }
 
-    /* Mensaje pequeño de estado */
     .status{
       margin-top: 10px;
       font-size: 0.85rem;
@@ -143,15 +176,16 @@
     }
 
     @media (prefers-reduced-motion: reduce){
-      .bg, .bg2, .shimmer { animation:none !important; }
+      .bg-base, .bubbles, .bubbles2, .shimmer { animation:none !important; }
     }
   </style>
 </head>
 
 <body>
-  <!-- Fondo -->
-  <div class="bg"></div>
-  <div class="bg2"></div>
+  <!-- Fondo circular/burbujas -->
+  <div class="bg-base"></div>
+  <div class="bubbles"></div>
+  <div class="bubbles2"></div>
   <div class="shimmer"></div>
 
   <!-- Contenido -->
@@ -163,17 +197,13 @@
     <div class="status" id="status"></div>
   </div>
 
-<!-- AUDIO --> 
-  <audio id="bg-music" preload="auto"> <source src="assets/MusicaparaBoda.m4a" type="audio/mp4"> 
-  Tu navegador no soporta audio. 
+  <!-- AUDIO -->
+  <audio id="bg-music" preload="auto">
+    <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
+    Tu navegador no soporta audio.
   </audio>
-  
-  <script> 
-  const bow = document.getElementById("bow"); 
-  const music = document.getElementById("bg-music"); 
-  bow.addEventListener("click", () => { music.play(); }); 
-  </script>
 
+  <!-- Script único (sin duplicados) -->
   <script>
     const bow = document.getElementById("bow");
     const music = document.getElementById("bg-music");
@@ -181,18 +211,14 @@
 
     bow.addEventListener("click", async () => {
       try {
-        // Si ya está sonando, no lo reiniciamos
-        if (!music.paused) return;
-
+        if (!music.paused) return; // no reiniciar si ya suena
         await music.play();
         statusEl.textContent = "Música activada";
       } catch (e) {
-        // Si falla, normalmente es por política del navegador o archivo no encontrado
-        statusEl.textContent = "No se pudo reproducir. Revisa que el audio exista en assets.";
+        statusEl.textContent = "No se pudo reproducir. Revisa el archivo en /assets.";
         console.error(e);
       }
     });
   </script>
 </body>
 </html>
-
