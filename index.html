@@ -1,143 +1,160 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <!-- META BÁSICO -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>J & V — Invitación de Boda</title>
-  <meta name="description" content="Toca el moño para abrir la invitación ✨" />
+  <meta name="description" content="Toca el moño para abrir la invitación" />
 
-  <!-- Open Graph -->
   <meta property="og:title" content="J & V — Invitación de Boda" />
-  <meta property="og:description" content="Toca el moño para abrir la invitación ✨" />
+  <meta property="og:description" content="Toca el moño para abrir la invitación" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/preview.jpeg" />
 
   <style>
-    /* ===== BASE ===== */
-    body {
-      margin: 0;
-      background: #fff;
-      font-family: "Poppins", sans-serif;
-      color: #222;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-
-      /* para que el fondo animado no genere scroll */
-      overflow: hidden;
+    :root{
+      /* Paleta perla (ajústala si quieres más blanco o más crema) */
+      --p1:#ffffff;
+      --p2:#fbf7f0; /* marfil muy suave */
+      --p3:#f1e8dc; /* champagne suave */
+      --p4:#ffffff;
+      --gold: goldenrod;
     }
 
-    /* ===== FONDO PERLA ANIMADO ===== */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -2;
+    * { box-sizing: border-box; }
 
-      background: linear-gradient(
-        120deg,
-        #ffffff 0%,
-        #fbf7f0 25%,
-        #ffffff 50%,
-        #f2e8dc 75%,
-        #ffffff 100%
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:#222;
+      overflow:hidden; /* sin scroll por el fondo */
+      background: var(--p1);
+    }
+
+    /* ===== Fondo animado estilo "tela/olas" ===== */
+    .bg{
+      position:fixed;
+      inset:-20%;
+      z-index:-3;
+      background:
+        radial-gradient(60% 70% at 20% 25%, rgba(255,255,255,.85), rgba(255,255,255,0) 60%),
+        radial-gradient(70% 70% at 80% 30%, rgba(255,255,255,.55), rgba(255,255,255,0) 62%),
+        radial-gradient(80% 80% at 50% 80%, rgba(240,232,220,.55), rgba(255,255,255,0) 60%),
+        linear-gradient(120deg, var(--p1), var(--p2), var(--p3), var(--p4));
+      filter: blur(18px);
+      transform: translateZ(0);
+      animation: drift 14s ease-in-out infinite alternate;
+    }
+
+    /* Capa extra para sensación de “tela” moviéndose */
+    .bg2{
+      position:fixed;
+      inset:-25%;
+      z-index:-2;
+      background:
+        radial-gradient(45% 55% at 30% 50%, rgba(255,255,255,.55), rgba(255,255,255,0) 65%),
+        radial-gradient(50% 60% at 70% 55%, rgba(245,238,228,.55), rgba(255,255,255,0) 65%);
+      filter: blur(26px);
+      opacity:.9;
+      transform: translateZ(0);
+      animation: drift2 10s ease-in-out infinite alternate;
+      mix-blend-mode: multiply; /* da look “tela” suave */
+    }
+
+    /* Shimmer perla (brillo suave que recorre el fondo) */
+    .shimmer{
+      position:fixed;
+      inset:-30%;
+      z-index:-1;
+      background: linear-gradient(115deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.55) 45%,
+        rgba(255,255,255,0) 60%
       );
-
-      background-size: 300% 300%;
-      animation: pearlMove 14s ease-in-out infinite;
+      filter: blur(18px);
+      opacity:.35;
+      transform: translateX(-30%) translateY(0) rotate(6deg);
+      animation: shimmerMove 8s ease-in-out infinite;
+      pointer-events:none;
     }
 
-    body::after {
-      content: "";
-      position: fixed;
-      inset: -40%;
-      z-index: -1;
-
-      background: radial-gradient(
-        circle at 30% 30%,
-        rgba(255, 255, 255, 0.65),
-        rgba(255, 255, 255, 0) 60%
-      );
-
-      animation: pearlGlow 10s ease-in-out infinite;
-      pointer-events: none;
+    @keyframes drift{
+      0%   { transform: translate(-2%, -2%) scale(1.02) rotate(-0.5deg); }
+      100% { transform: translate(2%,  1.5%) scale(1.06) rotate(0.6deg); }
+    }
+    @keyframes drift2{
+      0%   { transform: translate(2%, 1%) scale(1.05) rotate(0.8deg); opacity:.75; }
+      100% { transform: translate(-2%, -1.5%) scale(1.10) rotate(-0.8deg); opacity:.9; }
+    }
+    @keyframes shimmerMove{
+      0%   { transform: translateX(-40%) translateY(-10%) rotate(6deg); }
+      50%  { transform: translateX(15%)  translateY(6%) rotate(6deg); }
+      100% { transform: translateX(45%)  translateY(-8%) rotate(6deg); }
     }
 
-    @keyframes pearlMove {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    @keyframes pearlGlow {
-      0%   { transform: translate(-10%, -10%) rotate(0deg); opacity: 0.55; }
-      50%  { transform: translate(10%, 10%) rotate(8deg); opacity: 0.75; }
-      100% { transform: translate(-10%, -10%) rotate(0deg); opacity: 0.55; }
-    }
-
-    /* ===== TARJETA CENTRAL ===== */
-    .card {
+    /* ===== Contenido ===== */
+    .card{
+      text-align:center;
       padding: 22px 28px;
       border-radius: 18px;
-      background: rgba(255, 255, 255, 0.55);
+      background: rgba(255,255,255,.55);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(210, 190, 150, 0.25);
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(210,190,150,.22);
+      box-shadow: 0 18px 40px rgba(0,0,0,.08);
     }
 
-    h1 {
-      font-family: "Playfair Display", serif;
+    h1{
+      font-family: "Playfair Display", Georgia, "Times New Roman", serif;
       font-size: 3rem;
-      color: goldenrod;
-      margin: 0 0 0.5rem 0;
+      color: var(--gold);
+      margin: 0 0 .5rem 0;
     }
-
-    .text {
-      font-size: 0.9rem;
+    .text{
+      font-size: .9rem;
       letter-spacing: 2px;
-      color: #444;
+      color:#444;
       margin: 0 0 1.5rem 0;
     }
-
-    .bow {
+    .bow{
       width: 300px;
       max-width: 80vw;
       cursor: pointer;
-      transition: transform 0.6s ease;
-      user-select: none;
-      -webkit-user-drag: none;
+      transition: transform .6s ease;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+    .bow:hover{ transform: scale(1.05); }
+
+    @media (max-width: 420px){
+      h1{ font-size: 2.4rem; }
+      .card{ padding: 18px 18px; border-radius: 16px; }
+      .text{ letter-spacing: 1.5px; }
     }
 
-    .bow:hover {
-      transform: scale(1.05);
-    }
-
-    /* Para móviles: un poquito más compacto */
-    @media (max-width: 420px) {
-      h1 { font-size: 2.4rem; }
-      .card { padding: 18px 18px; border-radius: 16px; }
-      .text { letter-spacing: 1.5px; }
+    /* Accesibilidad: si el usuario prefiere menos movimiento */
+    @media (prefers-reduced-motion: reduce){
+      .bg, .bg2, .shimmer { animation: none !important; }
     }
   </style>
 </head>
 
 <body>
+  <!-- Fondo -->
+  <div class="bg"></div>
+  <div class="bg2"></div>
+  <div class="shimmer"></div>
 
+  <!-- Contenido -->
   <div class="card">
     <h1>J & V</h1>
     <p class="text">TOCA EL MOÑO PARA ABRIR</p>
 
-    <img
-      src="assets/bow-white.jpeg"
-      alt="Moño"
-      class="bow"
-      id="bow"
-    />
+    <img src="assets/bow-white.jpeg" alt="Moño" class="bow" id="bow" />
   </div>
 
   <!-- AUDIO -->
@@ -149,11 +166,7 @@
   <script>
     const bow = document.getElementById("bow");
     const music = document.getElementById("bg-music");
-
-    bow.addEventListener("click", () => {
-      music.play();
-    });
+    bow.addEventListener("click", () => { music.play(); });
   </script>
-
 </body>
 </html>
