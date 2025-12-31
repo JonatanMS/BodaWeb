@@ -14,6 +14,7 @@
   <meta property="og:image" content="assets/preview.jpeg" />
 
   <style>
+    /* ===== BASE ===== */
     body {
       margin: 0;
       background: #fff;
@@ -25,45 +26,119 @@
       justify-content: center;
       height: 100vh;
       text-align: center;
+
+      /* para que el fondo animado no genere scroll */
+      overflow: hidden;
+    }
+
+    /* ===== FONDO PERLA ANIMADO ===== */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+
+      background: linear-gradient(
+        120deg,
+        #ffffff 0%,
+        #fbf7f0 25%,
+        #ffffff 50%,
+        #f2e8dc 75%,
+        #ffffff 100%
+      );
+
+      background-size: 300% 300%;
+      animation: pearlMove 14s ease-in-out infinite;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -40%;
+      z-index: -1;
+
+      background: radial-gradient(
+        circle at 30% 30%,
+        rgba(255, 255, 255, 0.65),
+        rgba(255, 255, 255, 0) 60%
+      );
+
+      animation: pearlGlow 10s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes pearlMove {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes pearlGlow {
+      0%   { transform: translate(-10%, -10%) rotate(0deg); opacity: 0.55; }
+      50%  { transform: translate(10%, 10%) rotate(8deg); opacity: 0.75; }
+      100% { transform: translate(-10%, -10%) rotate(0deg); opacity: 0.55; }
+    }
+
+    /* ===== TARJETA CENTRAL ===== */
+    .card {
+      padding: 22px 28px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(210, 190, 150, 0.25);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06);
     }
 
     h1 {
       font-family: "Playfair Display", serif;
       font-size: 3rem;
       color: goldenrod;
-      margin-bottom: 0.5rem;
+      margin: 0 0 0.5rem 0;
     }
 
     .text {
       font-size: 0.9rem;
       letter-spacing: 2px;
       color: #444;
-      margin-bottom: 1.5rem;
+      margin: 0 0 1.5rem 0;
     }
 
     .bow {
       width: 300px;
+      max-width: 80vw;
       cursor: pointer;
       transition: transform 0.6s ease;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .bow:hover {
       transform: scale(1.05);
+    }
+
+    /* Para móviles: un poquito más compacto */
+    @media (max-width: 420px) {
+      h1 { font-size: 2.4rem; }
+      .card { padding: 18px 18px; border-radius: 16px; }
+      .text { letter-spacing: 1.5px; }
     }
   </style>
 </head>
 
 <body>
 
-  <h1>J & V</h1>
-  <p class="text">TOCA EL MOÑO PARA ABRIR</p>
+  <div class="card">
+    <h1>J & V</h1>
+    <p class="text">TOCA EL MOÑO PARA ABRIR</p>
 
-  <img
-    src="assets/bow-white.jpeg"
-    alt="Moño"
-    class="bow"
-    id="bow"
-  />
+    <img
+      src="assets/bow-white.jpeg"
+      alt="Moño"
+      class="bow"
+      id="bow"
+    />
+  </div>
 
   <!-- AUDIO -->
   <audio id="bg-music" preload="auto">
