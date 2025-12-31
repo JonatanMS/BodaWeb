@@ -4,21 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>J & V — Invitación de Boda</title>
-  <meta name="description" content="Toca el moño para abrir la invitación" />
-
-  <meta property="og:title" content="J & V — Invitación de Boda" />
-  <meta property="og:description" content="Toca el moño para abrir la invitación" />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="assets/preview.jpeg" />
 
   <style>
     :root{
-      /* Paleta perla (más perceptible, sigue siendo elegante) */
-      --p1:#ffffff;
-      --p2:#f6f1e9; /* marfil (se nota más en pantalla) */
-      --p3:#e9dccb; /* perla profunda (clave para ver el degradado) */
-      --p4:#ffffff;
-      --gold: goldenrod;
+      /* Paleta de prueba (dorados + grises para percibir movimiento) */
+      --w:#ffffff;
+      --g1:#e5e5e5;
+      --g2:#cfcfcf;
+      --gold1:#e0c68b;
+      --gold2:#c9a24d;
+      --goldText: goldenrod;
     }
 
     * { box-sizing: border-box; }
@@ -29,116 +24,99 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:#222;
-      overflow:hidden; /* sin scroll por el fondo */
-      background: var(--p1);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overflow:hidden;
+      background: var(--w);
     }
 
-    /* ===== Fondo animado estilo "tela/olas" ===== */
+    /* ===== FONDO TIPO TELA / OLAS (VISIBLE) ===== */
     .bg{
       position:fixed;
       inset:-20%;
       z-index:-3;
       background:
-        radial-gradient(60% 70% at 20% 25%, rgba(255,255,255,.80), rgba(255,255,255,0) 60%),
-        radial-gradient(70% 70% at 80% 30%, rgba(245,241,233,.65), rgba(255,255,255,0) 62%),
-        radial-gradient(80% 80% at 50% 80%, rgba(233,220,203,.55), rgba(255,255,255,0) 60%),
-        linear-gradient(120deg, var(--p1), var(--p2), var(--p3), var(--p4));
-      filter: blur(14px); /* antes 18px (muy “lavado”) */
-      transform: translateZ(0);
-      animation: drift 16s ease-in-out infinite alternate; /* un poco más lento y premium */
+        radial-gradient(65% 70% at 20% 25%, rgba(224,198,139,.65), rgba(255,255,255,0) 60%),
+        radial-gradient(70% 70% at 80% 30%, rgba(207,207,207,.65), rgba(255,255,255,0) 62%),
+        radial-gradient(80% 80% at 50% 80%, rgba(201,162,77,.55), rgba(255,255,255,0) 60%),
+        linear-gradient(120deg, var(--w), var(--g1), var(--gold1), var(--g2), var(--w));
+      filter: blur(10px);
+      animation: drift 12s ease-in-out infinite alternate;
     }
 
-    /* Capa extra para sensación de “tela” moviéndose */
     .bg2{
       position:fixed;
       inset:-25%;
       z-index:-2;
       background:
-        radial-gradient(45% 55% at 30% 50%, rgba(255,255,255,.45), rgba(255,255,255,0) 65%),
-        radial-gradient(50% 60% at 70% 55%, rgba(233,220,203,.45), rgba(255,255,255,0) 65%);
-      filter: blur(18px); /* antes 26px */
-      opacity:.95;        /* un toque más presente */
-      transform: translateZ(0);
-      animation: drift2 12s ease-in-out infinite alternate; /* antes 10s */
-      mix-blend-mode: multiply;
+        radial-gradient(50% 55% at 30% 50%, rgba(201,162,77,.55), rgba(255,255,255,0) 65%),
+        radial-gradient(55% 60% at 70% 55%, rgba(207,207,207,.55), rgba(255,255,255,0) 65%);
+      filter: blur(14px);
+      animation: drift2 9s ease-in-out infinite alternate;
     }
 
-    /* Shimmer perla (brillo suave que recorre el fondo) */
     .shimmer{
       position:fixed;
       inset:-30%;
       z-index:-1;
-      background: linear-gradient(115deg,
+      background: linear-gradient(
+        115deg,
         rgba(255,255,255,0) 0%,
-        rgba(255,255,255,.65) 45%,
+        rgba(224,198,139,.85) 45%,
         rgba(255,255,255,0) 60%
       );
-      filter: blur(12px);   /* antes 18px */
-      opacity:.42;          /* antes .35 */
-      transform: translateX(-30%) translateY(0) rotate(6deg);
-      animation: shimmerMove 9s ease-in-out infinite; /* un poco más lento */
+      filter: blur(8px);
+      opacity:.55;
+      animation: shimmerMove 7s ease-in-out infinite;
       pointer-events:none;
     }
 
     @keyframes drift{
-      0%   { transform: translate(-2%, -2%) scale(1.02) rotate(-0.5deg); }
-      100% { transform: translate(2%,  1.5%) scale(1.06) rotate(0.6deg); }
+      0%   { transform: translate(-3%, -2%) scale(1.03); }
+      100% { transform: translate(3%,  2%) scale(1.10); }
     }
     @keyframes drift2{
-      0%   { transform: translate(2%, 1%) scale(1.05) rotate(0.8deg); opacity:.80; }
-      100% { transform: translate(-2%, -1.5%) scale(1.10) rotate(-0.8deg); opacity:.98; }
+      0%   { transform: translate(2%, 1%) scale(1.05); }
+      100% { transform: translate(-2%, -2%) scale(1.12); }
     }
     @keyframes shimmerMove{
-      0%   { transform: translateX(-40%) translateY(-10%) rotate(6deg); }
-      50%  { transform: translateX(15%)  translateY(6%) rotate(6deg); }
-      100% { transform: translateX(45%)  translateY(-8%) rotate(6deg); }
+      0%   { transform: translateX(-40%) rotate(6deg); }
+      50%  { transform: translateX(15%) rotate(6deg); }
+      100% { transform: translateX(45%) rotate(6deg); }
     }
 
-    /* ===== Contenido ===== */
+    /* ===== CONTENIDO ===== */
     .card{
       text-align:center;
       padding: 22px 28px;
       border-radius: 18px;
-      background: rgba(255,255,255,.58);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(210,190,150,.25);
-      box-shadow: 0 18px 40px rgba(0,0,0,.08);
+      background: rgba(255,255,255,.65);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(201,162,77,.35);
+      box-shadow: 0 20px 45px rgba(0,0,0,.12);
     }
 
     h1{
-      font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+      font-family: Georgia, "Times New Roman", serif;
       font-size: 3rem;
-      color: var(--gold);
-      margin: 0 0 .5rem 0;
+      color: var(--goldText);
+      margin-bottom:.5rem;
     }
+
     .text{
-      font-size: .9rem;
-      letter-spacing: 2px;
+      font-size:.9rem;
+      letter-spacing:2px;
       color:#444;
-      margin: 0 0 1.5rem 0;
+      margin-bottom:1.5rem;
     }
+
     .bow{
-      width: 300px;
-      max-width: 80vw;
-      cursor: pointer;
+      width:300px;
+      max-width:80vw;
+      cursor:pointer;
       transition: transform .6s ease;
-      user-select:none;
-      -webkit-user-drag:none;
     }
+
     .bow:hover{ transform: scale(1.05); }
-
-    @media (max-width: 420px){
-      h1{ font-size: 2.4rem; }
-      .card{ padding: 18px 18px; border-radius: 16px; }
-      .text{ letter-spacing: 1.5px; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .bg, .bg2, .shimmer { animation: none !important; }
-    }
   </style>
 </head>
 
@@ -154,17 +132,5 @@
     <p class="text">TOCA EL MOÑO PARA ABRIR</p>
     <img src="assets/bow-white.jpeg" alt="Moño" class="bow" id="bow" />
   </div>
-
-  <!-- AUDIO -->
-  <audio id="bg-music" preload="auto">
-    <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
-    Tu navegador no soporta audio.
-  </audio>
-
-  <script>
-    const bow = document.getElementById("bow");
-    const music = document.getElementById("bg-music");
-    bow.addEventListener("click", () => { music.play(); });
-  </script>
 </body>
 </html>
