@@ -125,8 +125,8 @@
 
     /* ===== TARJETA ===== */
     .card{
-      width:min(520px, 100%);
-      padding:22px 28px;
+      width:min(680px, 100%);
+      padding:26px 42px;
       border-radius:18px;
       background: rgba(255,255,255,.75);
       backdrop-filter: blur(8px);
@@ -149,7 +149,7 @@
     }
 
     .bow{
-      width:min(340px, 92vw);
+      width:min(420px, 95vw);
       cursor:pointer;
       user-select:none;
       -webkit-user-drag:none;
@@ -157,6 +157,20 @@
     }
 
     .bow:hover{ transform:scale(1.05); }
+   
+    @media (max-width: 420px){
+  .card{
+    width: 100%;
+    padding: 22px 20px;
+  }
+
+  h1{
+    font-size: 3.2rem;
+  }
+
+  .bow{
+    width: 95vw;
+  }
 
     @media (prefers-reduced-motion: reduce){
       .bg-base, .bubbles, .bubbles2, .shimmer{ animation:none; }
@@ -181,3 +195,4 @@
 
 </body>
 </html>
+
