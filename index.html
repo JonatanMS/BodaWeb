@@ -4,16 +4,23 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>J & V — Invitación de Boda</title>
+  <meta name="description" content="Toca el moño para abrir la invitación" />
+
+  <meta property="og:title" content="J & V — Invitación de Boda" />
+  <meta property="og:description" content="Toca el moño para abrir la invitación" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/preview.jpeg" />
 
   <style>
     :root{
-      /* Paleta de prueba (dorados + grises para percibir movimiento) */
+      /* MODO PRUEBA: colores más fuertes para ver movimiento */
       --w:#ffffff;
-      --g1:#e5e5e5;
-      --g2:#cfcfcf;
-      --gold1:#e0c68b;
-      --gold2:#c9a24d;
-      --goldText: goldenrod;
+      --gray1:#e6e6e6;
+      --gray2:#bfbfbf;
+      --gold1:#f1d18a;  /* dorado claro */
+      --gold2:#c9972b;  /* dorado más fuerte */
+      --gold3:#8a6b18;  /* dorado profundo */
+      --goldText: #b8860b; /* goldenrod más serio */
     }
 
     * { box-sizing: border-box; }
@@ -25,98 +32,119 @@
       align-items:center;
       justify-content:center;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:#222;
       overflow:hidden;
       background: var(--w);
+      text-align:center;
     }
 
-    /* ===== FONDO TIPO TELA / OLAS (VISIBLE) ===== */
+    /* ===== FONDO “TELA/OLAS” (MÁS VISIBLE) ===== */
     .bg{
       position:fixed;
-      inset:-20%;
+      inset:-25%;
       z-index:-3;
       background:
-        radial-gradient(65% 70% at 20% 25%, rgba(224,198,139,.65), rgba(255,255,255,0) 60%),
-        radial-gradient(70% 70% at 80% 30%, rgba(207,207,207,.65), rgba(255,255,255,0) 62%),
-        radial-gradient(80% 80% at 50% 80%, rgba(201,162,77,.55), rgba(255,255,255,0) 60%),
-        linear-gradient(120deg, var(--w), var(--g1), var(--gold1), var(--g2), var(--w));
-      filter: blur(10px);
-      animation: drift 12s ease-in-out infinite alternate;
+        radial-gradient(70% 75% at 18% 22%, rgba(241,209,138,.80), rgba(255,255,255,0) 60%),
+        radial-gradient(80% 75% at 82% 30%, rgba(191,191,191,.75), rgba(255,255,255,0) 62%),
+        radial-gradient(85% 85% at 50% 82%, rgba(201,151,43,.65), rgba(255,255,255,0) 60%),
+        linear-gradient(120deg, var(--w), var(--gray1), var(--gold1), var(--gray2), var(--gold2), var(--w));
+      filter: blur(8px);
+      animation: drift 10s ease-in-out infinite alternate;
+      transform: translateZ(0);
     }
 
     .bg2{
       position:fixed;
-      inset:-25%;
+      inset:-30%;
       z-index:-2;
       background:
-        radial-gradient(50% 55% at 30% 50%, rgba(201,162,77,.55), rgba(255,255,255,0) 65%),
-        radial-gradient(55% 60% at 70% 55%, rgba(207,207,207,.55), rgba(255,255,255,0) 65%);
-      filter: blur(14px);
-      animation: drift2 9s ease-in-out infinite alternate;
+        radial-gradient(55% 60% at 28% 52%, rgba(201,151,43,.70), rgba(255,255,255,0) 65%),
+        radial-gradient(60% 65% at 72% 58%, rgba(138,107,24,.50), rgba(255,255,255,0) 68%);
+      filter: blur(12px);
+      opacity:.95;
+      animation: drift2 8s ease-in-out infinite alternate;
+      transform: translateZ(0);
+      mix-blend-mode: multiply;
     }
 
     .shimmer{
       position:fixed;
-      inset:-30%;
+      inset:-35%;
       z-index:-1;
       background: linear-gradient(
         115deg,
         rgba(255,255,255,0) 0%,
-        rgba(224,198,139,.85) 45%,
+        rgba(241,209,138,.95) 45%,
         rgba(255,255,255,0) 60%
       );
-      filter: blur(8px);
-      opacity:.55;
-      animation: shimmerMove 7s ease-in-out infinite;
+      filter: blur(6px);
+      opacity:.65;
+      animation: shimmerMove 6.5s ease-in-out infinite;
       pointer-events:none;
+      transform: translateZ(0);
     }
 
     @keyframes drift{
-      0%   { transform: translate(-3%, -2%) scale(1.03); }
-      100% { transform: translate(3%,  2%) scale(1.10); }
+      0%   { transform: translate(-4%, -3%) scale(1.03) rotate(-0.6deg); }
+      100% { transform: translate(4%,  3%) scale(1.12) rotate(0.7deg); }
     }
     @keyframes drift2{
-      0%   { transform: translate(2%, 1%) scale(1.05); }
-      100% { transform: translate(-2%, -2%) scale(1.12); }
+      0%   { transform: translate(3%, 2%) scale(1.06) rotate(0.8deg); }
+      100% { transform: translate(-3%, -2%) scale(1.15) rotate(-0.8deg); }
     }
     @keyframes shimmerMove{
-      0%   { transform: translateX(-40%) rotate(6deg); }
-      50%  { transform: translateX(15%) rotate(6deg); }
-      100% { transform: translateX(45%) rotate(6deg); }
+      0%   { transform: translateX(-45%) translateY(-10%) rotate(6deg); }
+      50%  { transform: translateX(10%)  translateY(8%)  rotate(6deg); }
+      100% { transform: translateX(50%)  translateY(-8%) rotate(6deg); }
     }
 
     /* ===== CONTENIDO ===== */
     .card{
-      text-align:center;
       padding: 22px 28px;
       border-radius: 18px;
-      background: rgba(255,255,255,.65);
+      background: rgba(255,255,255,.70);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(201,162,77,.35);
-      box-shadow: 0 20px 45px rgba(0,0,0,.12);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(201,151,43,.45);
+      box-shadow: 0 20px 45px rgba(0,0,0,.14);
     }
 
     h1{
       font-family: Georgia, "Times New Roman", serif;
       font-size: 3rem;
       color: var(--goldText);
-      margin-bottom:.5rem;
+      margin: 0 0 .5rem 0;
     }
 
     .text{
-      font-size:.9rem;
-      letter-spacing:2px;
-      color:#444;
-      margin-bottom:1.5rem;
+      font-size: .9rem;
+      letter-spacing: 2px;
+      color:#333;
+      margin: 0 0 1.5rem 0;
     }
 
     .bow{
       width:300px;
       max-width:80vw;
       cursor:pointer;
-      transition: transform .6s ease;
+      transition: transform .25s ease;
+      user-select:none;
+      -webkit-user-drag:none;
     }
 
-    .bow:hover{ transform: scale(1.05); }
+    .bow:active{ transform: scale(0.97); }
+
+    /* Mensaje pequeño de estado */
+    .status{
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color:#444;
+      min-height: 1.2em;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .bg, .bg2, .shimmer { animation:none !important; }
+    }
   </style>
 </head>
 
@@ -130,7 +158,35 @@
   <div class="card">
     <h1>J & V</h1>
     <p class="text">TOCA EL MOÑO PARA ABRIR</p>
+
     <img src="assets/bow-white.jpeg" alt="Moño" class="bow" id="bow" />
+    <div class="status" id="status"></div>
   </div>
+
+  <!-- AUDIO (importante: la ruta debe existir) -->
+  <audio id="bg-music" preload="auto">
+    <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
+    Tu navegador no soporta audio.
+  </audio>
+
+  <script>
+    const bow = document.getElementById("bow");
+    const music = document.getElementById("bg-music");
+    const statusEl = document.getElementById("status");
+
+    bow.addEventListener("click", async () => {
+      try {
+        // Si ya está sonando, no lo reiniciamos
+        if (!music.paused) return;
+
+        await music.play();
+        statusEl.textContent = "Música activada";
+      } catch (e) {
+        // Si falla, normalmente es por política del navegador o archivo no encontrado
+        statusEl.textContent = "No se pudo reproducir. Revisa que el audio exista en assets.";
+        console.error(e);
+      }
+    });
+  </script>
 </body>
 </html>
