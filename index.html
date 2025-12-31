@@ -163,11 +163,16 @@
     <div class="status" id="status"></div>
   </div>
 
-  <!-- AUDIO (importante: la ruta debe existir) -->
-  <audio id="bg-music" preload="auto">
-    <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
-    Tu navegador no soporta audio.
+<!-- AUDIO --> 
+  <audio id="bg-music" preload="auto"> <source src="assets/MusicaparaBoda.m4a" type="audio/mp4"> 
+  Tu navegador no soporta audio. 
   </audio>
+  
+  <script> 
+  const bow = document.getElementById("bow"); 
+  const music = document.getElementById("bg-music"); 
+  bow.addEventListener("click", () => { music.play(); }); 
+  </script>
 
   <script>
     const bow = document.getElementById("bow");
@@ -190,3 +195,4 @@
   </script>
 </body>
 </html>
+
