@@ -130,6 +130,7 @@
       border-radius:18px;
       background: rgba(255,255,255,.75);
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border:1px solid rgba(201,151,43,.45);
       box-shadow:0 20px 45px rgba(0,0,0,.14);
     }
@@ -155,23 +156,27 @@
       -webkit-user-drag:none;
       transition:transform .3s ease;
     }
-
     .bow:hover{ transform:scale(1.05); }
-   
+
+    .status{
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color:#444;
+      min-height: 1.2em;
+    }
+
+    /* ===== MÓVIL ===== */
     @media (max-width: 420px){
-  .card{
-    width: 100%;
-    padding: 22px 20px;
-  }
+      .card{
+        width: 100%;
+        padding: 24px 18px;
+      }
+      h1{ font-size: 2.9rem; }
+      .text{ letter-spacing: 1.6px; }
+      .bow{ width: 96vw; }
+    }
 
-  h1{
-    font-size: 3.2rem;
-  }
-
-  .bow{
-    width: 95vw;
-  }
-
+    /* Accesibilidad */
     @media (prefers-reduced-motion: reduce){
       .bg-base, .bubbles, .bubbles2, .shimmer{ animation:none; }
     }
@@ -179,7 +184,6 @@
 </head>
 
 <body>
-
   <!-- Fondo -->
   <div class="bg-base"></div>
   <div class="bubbles"></div>
@@ -189,10 +193,33 @@
   <!-- Invitación -->
   <div class="card">
     <h1>J & V</h1>
-    <p class="text">BIENVENIDOS A NUESTRA INVITACIÓN</p>
-    <img src="assets/bow-white.jpeg" alt="Moño" class="bow" />
+    <p class="text">TOCA EL MOÑO PARA ABRIR</p>
+
+    <!-- IMPORTANTE: id="bow" para el click -->
+    <img src="assets/bow-white.jpeg" alt="Moño" class="bow" id="bow" />
+    <div class="status" id="status"></div>
   </div>
 
+  <!-- AUDIO -->
+  <audio id="bg-music" preload="auto">
+    <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
+    Tu navegador no soporta audio.
+  </audio>
+
+  <script>
+    const bow = document.getElementById("bow");
+    const music = document.getElementById("bg-music");
+    const statusEl = document.getElementById("status");
+
+    bow.addEventListener("click", async () => {
+      try {
+        if (!music.paused) return; // ya está sonando
+        await music.play();
+      } catch (e) {
+        statusEl.textContent = "No se pudo reproducir. Verifica el archivo en /assets.";
+        console.error(e);
+      }
+    });
+  </script>
 </body>
 </html>
-
