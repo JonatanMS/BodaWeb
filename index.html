@@ -67,7 +67,7 @@
     radial-gradient(circle at 90% 15%, rgba(255,255,255,.28) 0 14%, rgba(255,255,255,0) 15%);
 
   /* ✅ reemplaza animation por movimiento con variables */
-  transform: translate(calc(var(--bx1, 0) * 1%), calc(var(--by1, 0) * 1%)) scale(var(--bs1, 1));
+ transform: translate(var(--bx1, 0%), var(--by1, 0%)) scale(var(--bs1, 1));
   transition: transform 5000ms ease-in-out;
   will-change: transform;
 }
@@ -87,7 +87,7 @@
   mix-blend-mode: soft-light;
 
   /* ✅ reemplaza animation por movimiento con variables */
-  transform: translate(calc(var(--bx2, 0) * 1%), calc(var(--by2, 0) * 1%)) scale(var(--bs2, 1.02));
+  transform: translate(var(--bx2, 0%), var(--by2, 0%)) scale(var(--bs2, 1.02));
   transition: transform 420ms ease-in-out;
   will-change: transform;
 }
@@ -274,13 +274,11 @@
       }
 
       function apply(){
-        document.documentElement.style.setProperty("--bx1", s1.x.toFixed(2));
-        document.documentElement.style.setProperty("--by1", s1.y.toFixed(2));
-        document.documentElement.style.setProperty("--bs1", s1.sc.toFixed(3));
+document.documentElement.style.setProperty("--bx1", `${s1.x.toFixed(2)}%`);
+document.documentElement.style.setProperty("--by1", `${s1.y.toFixed(2)}%`);
 
-        document.documentElement.style.setProperty("--bx2", s2.x.toFixed(2));
-        document.documentElement.style.setProperty("--by2", s2.y.toFixed(2));
-        document.documentElement.style.setProperty("--bs2", s2.sc.toFixed(3));
+document.documentElement.style.setProperty("--bx2", `${s2.x.toFixed(2)}%`);
+document.documentElement.style.setProperty("--by2", `${s2.y.toFixed(2)}%`);
       }
 
       apply();
@@ -299,5 +297,6 @@ setInterval(() => {
   </script>
 </body>
 </html>
+
 
 
