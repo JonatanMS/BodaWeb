@@ -170,15 +170,27 @@
       min-height: 1.2em;
     }
 
-    /* ✅ subimos breakpoint para cubrir iPhone Pro Max (~430px) */
-    @media (max-width: 520px){
-      .card{
-        width: 92vw;
-        padding: 24px 20px; /* más seguro que 42px laterales */
-      }
-      .text{ letter-spacing: 1.6px; }
-      .jv-logo img{ width: 210px; }
-    }
+@media (max-width: 520px){
+  /* ✅ Tarjeta más angosta => más fondo visible */
+  .card{
+    width: 84vw;              /* antes 92vw */
+    padding: 22px 18px;       /* un poco más compacto */
+    border-radius: 18px;
+  }
+
+  .jv-logo img{ width: 200px; }
+
+  .text{
+    letter-spacing: 1.4px;
+    margin: 0 0 1.1rem 0;
+    font-size: .9rem;
+  }
+
+  /* ✅ Moño sigue respondiendo, pero algo más chico para dar aire */
+  .bow{
+    max-width: 360px;         /* antes 420px */
+  }
+}
 
     @media (prefers-reduced-motion: reduce){
       .bg-base, .bubbles, .bubbles2, .shimmer{ animation:none; }
@@ -225,3 +237,4 @@
   </script>
 </body>
 </html>
+
