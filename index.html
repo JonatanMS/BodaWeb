@@ -54,34 +54,34 @@
       animation: baseMove 14s ease-in-out infinite;
     }
 
-    .bubbles{
-      position:fixed;
-      inset:-6%;
-      z-index:-3;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 12% 20%, rgba(201,151,43,.38) 0 24%, rgba(255,255,255,0) 25%),
-        radial-gradient(circle at 30% 75%, rgba(255,248,235,.38) 0 20%, rgba(255,255,255,0) 21%),
-        radial-gradient(circle at 55% 30%, rgba(241,209,138,.35) 0 22%, rgba(255,255,255,0) 23%),
-        radial-gradient(circle at 80% 60%, rgba(201,151,43,.30) 0 18%, rgba(255,255,255,0) 19%),
-        radial-gradient(circle at 90% 15%, rgba(255,255,255,.28) 0 14%, rgba(255,255,255,0) 15%);
-      animation: bubblesFloat 3s ease-in-out infinite alternate;
-    }
+   .bubbles{
+  position:fixed;
+  inset:-6%;
+  z-index:-3;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(201,151,43,.38) 0 24%, rgba(255,255,255,0) 25%),
+    radial-gradient(circle at 30% 75%, rgba(255,248,235,.38) 0 20%, rgba(255,255,255,0) 21%),
+    radial-gradient(circle at 55% 30%, rgba(241,209,138,.35) 0 22%, rgba(255,255,255,0) 23%),
+    radial-gradient(circle at 80% 60%, rgba(201,151,43,.30) 0 18%, rgba(255,255,255,0) 19%),
+    radial-gradient(circle at 90% 15%, rgba(255,255,255,.28) 0 14%, rgba(255,255,255,0) 15%);
+  animation: bubblesFloat 5s linear infinite;   /* ✅ sin alternate */
+}
 
-    .bubbles2{
-      position:fixed;
-      inset:-10%;
-      z-index:-2;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 18% 55%, rgba(201,151,43,.22) 0 10%, rgba(255,255,255,0) 11%),
-        radial-gradient(circle at 35% 40%, rgba(241,209,138,.20) 0 12%, rgba(255,255,255,0) 13%),
-        radial-gradient(circle at 48% 85%, rgba(255,248,235,.22) 0 9%, rgba(255,255,255,0) 10%),
-        radial-gradient(circle at 70% 22%, rgba(201,151,43,.18) 0 11%, rgba(255,255,255,0) 12%),
-        radial-gradient(circle at 85% 70%, rgba(255,255,255,.18) 0 10%, rgba(255,255,255,0) 11%);
-      animation: bubblesFloat2 2s ease-in-out infinite alternate;
-      mix-blend-mode:multiply;
-    }
+.bubbles2{
+  position:fixed;
+  inset:-10%;
+  z-index:-2;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 18% 55%, rgba(201,151,43,.22) 0 10%, rgba(255,255,255,0) 11%),
+    radial-gradient(circle at 35% 40%, rgba(241,209,138,.20) 0 12%, rgba(255,255,255,0) 13%),
+    radial-gradient(circle at 48% 85%, rgba(255,248,235,.22) 0 9%, rgba(255,255,255,0) 10%),
+    radial-gradient(circle at 70% 22%, rgba(201,151,43,.18) 0 11%, rgba(255,255,255,0) 12%),
+    radial-gradient(circle at 85% 70%, rgba(255,255,255,.18) 0 10%, rgba(255,255,255,0) 11%);
+  animation: bubblesFloat2 3s linear infinite;  /* ✅ sin alternate */
+  mix-blend-mode: soft-light;
+}
 
     .shimmer{
       position:fixed;
@@ -103,14 +103,21 @@
       50%{ background-position:100% 50%; }
       100%{ background-position:0% 50%; }
     }
-    @keyframes bubblesFloat{
-      0%{ transform:translate(-2%, -1%) scale(1); }
-      100%{ transform:translate(2%, 1.5%) scale(1.05); }
-    }
-    @keyframes bubblesFloat2{
-      0%{ transform:translate(2%, 1.5%) scale(1.02); }
-      100%{ transform:translate(-2%, -1%) scale(1.08); }
-    }
+@keyframes bubblesFloat{
+  0%   { transform: translate(-3%, -2%) scale(1); }
+  18%  { transform: translate(4%,  1%) scale(1.03); }
+  37%  { transform: translate(1%,  4%) scale(1.02); }
+  58%  { transform: translate(-4%, 2%) scale(1.04); }
+  78%  { transform: translate(-1%, -4%) scale(1.03); }
+  100% { transform: translate(-3%, -2%) scale(1); }
+}
+@keyframes bubblesFloat2{
+  0%   { transform: translate(3%,  2%) scale(1.02); }
+  22%  { transform: translate(-2%, 4%) scale(1.06); }
+  45%  { transform: translate(-4%, -1%) scale(1.04); }
+  70%  { transform: translate(2%, -4%) scale(1.07); }
+  100% { transform: translate(3%,  2%) scale(1.02); }
+}
     @keyframes shimmerMove{
       0%{ transform:translateX(-40%) rotate(6deg); }
       50%{ transform:translateX(10%) rotate(6deg); }
@@ -240,6 +247,7 @@
   </script>
 </body>
 </html>
+
 
 
 
