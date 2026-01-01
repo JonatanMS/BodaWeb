@@ -126,12 +126,22 @@
       box-shadow: 0 20px 45px rgba(0,0,0,.14);
     }
 
-    h1{
-      font-family: "Playfair Display", Georgia, serif;
-      font-size: 3rem;
-      margin: 0 0 .5rem 0;
-    }
+    /* ===== LOGO J&V COMO IMAGEN ===== */
+.jv-logo{
+  display:flex;
+  justify-content:center;
+  margin: 0 0 12px 0;
+}
 
+.jv-logo img{
+  width: 320px;      /* ajusta aquí el tamaño */
+  max-width: 85%;
+  height: auto;
+  display:block;
+
+  /* opcional: que “pegue” con el estilo */
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,.20));
+}
     .text{
       font-size: .95rem;
       letter-spacing: 2px;
@@ -161,55 +171,15 @@
         width: 92vw;
         padding: 60px 20px;   /* más “largo” vertical como pediste */
       }
-      h1{ font-size: 2.9rem; }
       .text{ letter-spacing: 1.6px; }
       .bow{max-width: 100%; /* <- en móvil, que no exceda el card */ }
+      .jv-logo img{ width: 260px; }
     }
 
     @media (prefers-reduced-motion: reduce){
       .bg-base, .bubbles, .bubbles2, .shimmer{ animation:none; }
     }
-/* ===== J & V DORADO ESPEJO ===== */
-.jv-gold{
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: 3rem;
-  margin: 0 0 .5rem 0;
 
-  color: transparent;
-  background: linear-gradient(
-    180deg,
-    #fff8dc 0%,
-    #f7e3a1 18%,
-    #e7c35a 32%,
-    #ffd700 45%,
-    #c9972b 60%,
-    #8b5a00 78%,
-    #fff1b8 100%
-  );
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  background-clip: text;
-
-  -webkit-text-stroke: 0.6px rgba(120,70,0,.35);
-  text-shadow:
-    0 1px 1px rgba(255,255,255,.35),
-    0 3px 6px rgba(0,0,0,.25);
-
-  animation: jvShine 6s ease-in-out infinite;
-}
-
-@keyframes jvShine{
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@media (max-width: 420px){
-  .jv-gold{
-    font-size: 2.6rem;
-    -webkit-text-stroke: 0.4px rgba(120,70,0,.3);
-  }
-}
   </style>
 </head>
 
@@ -220,7 +190,9 @@
   <div class="shimmer"></div>
 
   <div class="card">
-    <h1 class="jv-gold">J & V</h1>
+    <div class="jv-logo">
+      <img src="assets/jv-gold.png" alt="J & V" />
+    </div>
     <p class="text">TOCA EL MOÑO PARA ABRIR</p>
 
     <img src="assets/bow-white.jpeg" alt="Moño" class="bow" id="bow" />
@@ -250,6 +222,7 @@
   </script>
 </body>
 </html>
+
 
 
 
