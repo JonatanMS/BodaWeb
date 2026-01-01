@@ -17,6 +17,9 @@
 
     *{ box-sizing:border-box; }
 
+    /* ✅ regla general: ninguna imagen puede salirse del contenedor */
+    img{ max-width:100%; height:auto; }
+
     html, body{
       width:100%;
       height:100%;
@@ -24,11 +27,9 @@
     }
 
     body{
-      /* Centrado robusto en móvil */
       display:grid;
       place-items:center;
 
-      /* Alturas correctas en móvil */
       min-height:100vh;
       min-height:100svh;
       min-height:100dvh;
@@ -41,7 +42,6 @@
       color:#222;
     }
 
-    /* ===== FONDO BASE ===== */
     .bg-base{
       position:fixed;
       inset:0;
@@ -114,9 +114,8 @@
       100%{ transform:translateX(45%) rotate(6deg); }
     }
 
-    /* ===== TARJETA ===== */
     .card{
-      width: min(680px, 92vw);   /* evita que se “salga” y cause esquina */
+      width: min(680px, 92vw);
       padding: 26px 42px;
       border-radius: 18px;
       background: rgba(255,255,255,.75);
@@ -124,24 +123,25 @@
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(201,151,43,.45);
       box-shadow: 0 20px 45px rgba(0,0,0,.14);
+
+      /* ✅ opcional pero útil: si algo se pasa, se recorta dentro del borde redondeado */
+      overflow:hidden;
     }
 
-    /* ===== LOGO J&V COMO IMAGEN ===== */
-.jv-logo{
-  display:flex;
-  justify-content:center;
-  margin: 0 0 12px 0;
-}
+    .jv-logo{
+      display:flex;
+      justify-content:center;
+      margin: 0 0 12px 0;
+    }
 
-.jv-logo img{
-  width: 320px;      /* ajusta aquí el tamaño */
-  max-width: 85%;
-  height: auto;
-  display:block;
+    .jv-logo img{
+      width: 320px;
+      max-width: 85%;
+      height: auto;
+      display:block;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,.20));
+    }
 
-  /* opcional: que “pegue” con el estilo */
-  filter: drop-shadow(0 3px 6px rgba(0,0,0,.20));
-}
     .text{
       font-size: .95rem;
       letter-spacing: 2px;
@@ -149,8 +149,13 @@
       margin: 0 0 1.5rem 0;
     }
 
+    /* ✅ clave: el moño ocupa el 100% del ancho disponible del contenido,
+       pero no pasa de 420px */
     .bow{
-      width: min(420px, 90vw);
+      display:block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
       cursor:pointer;
       user-select:none;
       -webkit-user-drag:none;
@@ -165,23 +170,19 @@
       min-height: 1.2em;
     }
 
-    /* ===== MÓVIL ===== */
-@media (max-width: 420px){
-  .card{
-    width: 92vw;
-    padding: 60px 30px;   /* ⬅ antes estaba muy grande */
-  }
-
-  .text{ letter-spacing: 1.6px; }
-  .bow{ max-width: 100%; }
-
-  .jv-logo img{ width: 210px; } /* opcional, un poco más elegante */
-}
+    /* ✅ subimos breakpoint para cubrir iPhone Pro Max (~430px) */
+    @media (max-width: 520px){
+      .card{
+        width: 92vw;
+        padding: 24px 20px; /* más seguro que 42px laterales */
+      }
+      .text{ letter-spacing: 1.6px; }
+      .jv-logo img{ width: 210px; }
+    }
 
     @media (prefers-reduced-motion: reduce){
       .bg-base, .bubbles, .bubbles2, .shimmer{ animation:none; }
     }
-
   </style>
 </head>
 
@@ -224,17 +225,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
