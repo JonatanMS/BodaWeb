@@ -54,43 +54,54 @@
       animation: baseMove 7s ease-in-out infinite;
     }
 
-   .bubbles{
-  position:fixed;
-  inset:-6%;
-  z-index:-3;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at 12% 20%, rgba(201,151,43,.38) 0 24%, rgba(255,255,255,0) 25%),
-    radial-gradient(circle at 30% 75%, rgba(255,248,235,.38) 0 20%, rgba(255,255,255,0) 21%),
-    radial-gradient(circle at 55% 30%, rgba(241,209,138,.35) 0 22%, rgba(255,255,255,0) 23%),
-    radial-gradient(circle at 80% 60%, rgba(201,151,43,.30) 0 18%, rgba(255,255,255,0) 19%),
-    radial-gradient(circle at 90% 15%, rgba(255,255,255,.28) 0 14%, rgba(255,255,255,0) 15%);
+    /* ====== CAMBIO MÍNIMO: bubbles ahora son CONTENEDORES (ya no background fijo) ====== */
+    .bubbles{
+      position:fixed;
+      inset:-6%;
+      z-index:-3;
+      pointer-events:none;
+      overflow:hidden;
+    }
 
-  /* ✅ reemplaza animation por movimiento con variables */
-transform: translate3d(var(--bx1, 0%), var(--by1, 0%), 0) scale(var(--bs1, 1));
-transition: transform 700ms ease-in-out;
-  will-change: transform;
-}
+    .bubbles2{
+      position:fixed;
+      inset:-10%;
+      z-index:-2;
+      pointer-events:none;
+      overflow:hidden;
+      mix-blend-mode: soft-light;
+    }
 
-.bubbles2{
-  position:fixed;
-  inset:-10%;
-  z-index:-2;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at 18% 55%, rgba(201,151,43,.22) 0 10%, rgba(255,255,255,0) 11%),
-    radial-gradient(circle at 35% 40%, rgba(241,209,138,.20) 0 12%, rgba(255,255,255,0) 13%),
-    radial-gradient(circle at 48% 85%, rgba(255,248,235,.22) 0 9%, rgba(255,255,255,0) 10%),
-    radial-gradient(circle at 70% 22%, rgba(201,151,43,.18) 0 11%, rgba(255,255,255,0) 12%),
-    radial-gradient(circle at 85% 70%, rgba(255,255,255,.18) 0 10%, rgba(255,255,255,0) 11%);
+    /* ====== NUEVO: burbujas individuales ====== */
+    .bubble{
+      position:absolute;
+      border-radius:999px;
+      pointer-events:none;
+      will-change: transform;
+      transform: translate3d(0,0,0);
+    }
 
-  mix-blend-mode: soft-light;
+    .bubble.gold{
+      background: radial-gradient(circle at 30% 30%,
+        rgba(255,255,255,.38) 0%,
+        var(--bChamp) 35%,
+        var(--bGold) 72%,
+        rgba(255,255,255,0) 100%);
+    }
 
-  /* ✅ reemplaza animation por movimiento con variables */
-transform: translate3d(var(--bx2, 0%), var(--by2, 0%), 0) scale(var(--bs2, 1.02));
-transition: transform 600ms ease-in-out;
-  will-change: transform;
-}
+    .bubble.cream{
+      background: radial-gradient(circle at 30% 30%,
+        rgba(255,255,255,.42) 0%,
+        var(--bCream) 58%,
+        rgba(255,255,255,0) 100%);
+    }
+
+    .bubble.white{
+      background: radial-gradient(circle at 30% 30%,
+        rgba(255,255,255,.35) 0%,
+        var(--bWhite) 62%,
+        rgba(255,255,255,0) 100%);
+    }
 
     .shimmer{
       position:fixed;
@@ -112,6 +123,8 @@ transition: transform 600ms ease-in-out;
       50%{ background-position:100% 50%; }
       100%{ background-position:0% 50%; }
     }
+
+    /* (Dejo tus keyframes aunque ya no se usen; no estorban) */
 @keyframes bubblesFloat{
   0%   { transform: translate(-3%, -2%) scale(1); }
   18%  { transform: translate(4%,  1%) scale(1.03); }
@@ -127,6 +140,7 @@ transition: transform 600ms ease-in-out;
   70%  { transform: translate(2%, -4%) scale(1.07); }
   100% { transform: translate(3%,  2%) scale(1.02); }
 }
+
     @keyframes shimmerMove{
       0%{ transform:translateX(-40%) rotate(6deg); }
       50%{ transform:translateX(10%) rotate(6deg); }
@@ -168,8 +182,6 @@ transition: transform 600ms ease-in-out;
       margin: 0 0 1.5rem 0;
     }
 
-    /* ✅ clave: el moño ocupa el 100% del ancho disponible del contenido,
-       pero no pasa de 420px */
     .bow{
       display:block;
       width: 100%;
@@ -190,10 +202,9 @@ transition: transform 600ms ease-in-out;
     }
 
 @media (max-width: 520px){
-  /* ✅ Tarjeta más angosta => más fondo visible */
   .card{
-    width: 84vw;              /* antes 92vw */
-    padding: 22px 18px;       /* un poco más compacto */
+    width: 84vw;
+    padding: 22px 18px;
     border-radius: 18px;
   }
 
@@ -205,14 +216,15 @@ transition: transform 600ms ease-in-out;
     font-size: .9rem;
   }
 
-  /* ✅ Moño sigue respondiendo, pero algo más chico para dar aire */
   .bow{
-    max-width: 360px;         /* antes 420px */
+    max-width: 360px;
   }
 }
 
     @media (prefers-reduced-motion: reduce){
       .bg-base, .bubbles, .bubbles2, .shimmer{ animation:none; }
+      /* opcional: si reduce-motion, ocultamos burbujas generadas */
+      .bubble{ display:none; }
     }
   </style>
 </head>
@@ -254,52 +266,118 @@ transition: transform 600ms ease-in-out;
       }
     });
 
-    /* ✅ Movimiento NO predecible (random-walk) SOLO para burbujas */
+    /* ✅ CAMBIO SOLO DE MOVIMIENTO: burbujas independientes (no bloque) */
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!reduceMotion) {
-      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+      const layer1 = document.querySelector(".bubbles");
+      const layer2 = document.querySelector(".bubbles2");
 
-      const s1 = { x: 0, y: 0, sc: 1.00 };
-      const s2 = { x: 0, y: 0, sc: 1.02 };
+      // Velocidad (px/seg). Sube estos valores si quieres más rápido.
+      const SPEED_1 = 26; // capa 1
+      const SPEED_2 = 18; // capa 2
 
-      function step(state, maxStep, maxPos, scMin, scMax){
-        const dx = (Math.random() * 2 - 1) * maxStep;
-        const dy = (Math.random() * 2 - 1) * maxStep;
+      function rand(min, max){ return Math.random() * (max - min) + min; }
 
-        state.x = clamp(state.x + dx, -maxPos, maxPos);
-        state.y = clamp(state.y + dy, -maxPos, maxPos);
+      function makeBubble(parent, kind, sizeMin, sizeMax, opMin, opMax){
+        const el = document.createElement("span");
+        el.className = `bubble ${kind}`;
+        parent.appendChild(el);
 
-        const dsc = (Math.random() * 2 - 1) * 0.01;
-        state.sc = clamp(state.sc + dsc, scMin, scMax);
+        const size = rand(sizeMin, sizeMax);
+        el.style.width = `${size}px`;
+        el.style.height = `${size}px`;
+        el.style.opacity = rand(opMin, opMax).toFixed(2);
+
+        // Estado
+        const b = {
+          el,
+          size,
+          px: 0,
+          py: 0,
+          vx: rand(-1, 1),
+          vy: rand(-1, 1),
+          ax: 0,
+          ay: 0,
+          steerLeft: rand(0.6, 1.4)
+        };
+
+        // Normaliza dirección inicial
+        const mag = Math.hypot(b.vx, b.vy) || 1;
+        b.vx /= mag; b.vy /= mag;
+
+        return b;
       }
 
-function apply(){
-  document.documentElement.style.setProperty("--bx1", `${s1.x.toFixed(2)}%`);
-  document.documentElement.style.setProperty("--by1", `${s1.y.toFixed(2)}%`);
-  document.documentElement.style.setProperty("--bs1", `${s1.sc.toFixed(3)}`);
+      function setup(parent, count, palette, sizeMin, sizeMax, opMin, opMax){
+        const arr = [];
+        for (let i=0; i<count; i++){
+          const kind = palette[(Math.random() * palette.length) | 0];
+          const b = makeBubble(parent, kind, sizeMin, sizeMax, opMin, opMax);
+          // posición inicial aleatoria dentro del viewport
+          b.px = rand(0, Math.max(0, window.innerWidth - b.size));
+          b.py = rand(0, Math.max(0, window.innerHeight - b.size));
+          arr.push(b);
+        }
+        return arr;
+      }
 
-  document.documentElement.style.setProperty("--bx2", `${s2.x.toFixed(2)}%`);
-  document.documentElement.style.setProperty("--by2", `${s2.y.toFixed(2)}%`);
-  document.documentElement.style.setProperty("--bs2", `${s2.sc.toFixed(3)}`);
-}
+      // Cantidad y look por capa
+      const bubbles1 = setup(layer1, 10, ["gold","cream","white"], 80, 200, 0.18, 0.38);
+      const bubbles2 = setup(layer2,  8, ["gold","cream","white"], 60, 160, 0.12, 0.28);
 
-      apply();
+      let w = window.innerWidth, h = window.innerHeight;
+      window.addEventListener("resize", () => {
+        w = window.innerWidth;
+        h = window.innerHeight;
+      }, { passive:true });
 
-      // Tiempos desincronizados para evitar patrón
-setInterval(() => {
-  step(s1, 2.4, 7, 0.98, 1.06);
-  apply();
-}, 700);
+      let last = performance.now();
 
-setInterval(() => {
-  step(s2, 1.8, 6, 1.00, 1.08);
-  apply();
-}, 600);
+      function tick(now){
+        const dt = Math.min(0.033, (now - last) / 1000);
+        last = now;
+
+        function update(arr, speed){
+          for (const b of arr){
+            // steering aleatorio suave
+            b.steerLeft -= dt;
+            if (b.steerLeft <= 0){
+              b.steerLeft = rand(0.6, 1.4);
+              b.ax = rand(-0.9, 0.9);
+              b.ay = rand(-0.9, 0.9);
+            }
+
+            b.vx += b.ax * dt * 0.6;
+            b.vy += b.ay * dt * 0.6;
+
+            // normaliza para mantener velocidad constante
+            const mag = Math.hypot(b.vx, b.vy) || 1;
+            b.vx /= mag; b.vy /= mag;
+
+            b.px += b.vx * speed * dt;
+            b.py += b.vy * speed * dt;
+
+            const maxX = Math.max(0, w - b.size);
+            const maxY = Math.max(0, h - b.size);
+
+            // rebote
+            if (b.px <= 0){ b.px = 0; b.vx = Math.abs(b.vx); }
+            if (b.px >= maxX){ b.px = maxX; b.vx = -Math.abs(b.vx); }
+            if (b.py <= 0){ b.py = 0; b.vy = Math.abs(b.vy); }
+            if (b.py >= maxY){ b.py = maxY; b.vy = -Math.abs(b.vy); }
+
+            b.el.style.transform = `translate3d(${b.px}px, ${b.py}px, 0)`;
+          }
+        }
+
+        update(bubbles1, SPEED_1);
+        update(bubbles2, SPEED_2);
+
+        requestAnimationFrame(tick);
+      }
+
+      requestAnimationFrame(tick);
     }
   </script>
 </body>
 </html>
-
-
-
-
