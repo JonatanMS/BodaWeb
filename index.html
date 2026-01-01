@@ -6,14 +6,12 @@
   <title>J & V — Invitación de Boda</title>
 
   <style>
-    :root{
-      --white:#ffffff;
-      --gray1:#e6e6e6;
-      --gray2:#cfcfcf;
-      --gold1:#f1d18a;
-      --gold2:#c9972b;
-      --goldText:#b8860b;
-    }
+:root{
+  --bGold: rgba(201,151,43,.34);
+  --bChamp: rgba(241,209,138,.32);
+  --bCream: rgba(255,248,235,.34);
+  --bWhite: rgba(255,255,255,.26);
+}
 
     *{ box-sizing:border-box; }
 
@@ -46,7 +44,12 @@
       position:fixed;
       inset:0;
       z-index:-4;
-      background: linear-gradient(135deg, var(--white), var(--gray1), var(--gold1), var(--gray2), var(--white));
+        background: linear-gradient(135deg,
+        #ffffff 0%,
+        #fff6e6 25%,
+        #f1d18a 55%,
+        #fffaf1 80%,
+        #ffffff 100%);
       background-size:300% 300%;
       animation: baseMove 14s ease-in-out infinite;
     }
@@ -57,11 +60,11 @@
       z-index:-3;
       pointer-events:none;
       background:
-        radial-gradient(circle at 12% 20%, rgba(201,151,43,.45) 0 24%, rgba(255,255,255,0) 25%),
-        radial-gradient(circle at 30% 75%, rgba(207,207,207,.40) 0 20%, rgba(255,255,255,0) 21%),
-        radial-gradient(circle at 55% 30%, rgba(241,209,138,.40) 0 22%, rgba(255,255,255,0) 23%),
-        radial-gradient(circle at 80% 60%, rgba(201,151,43,.38) 0 18%, rgba(255,255,255,0) 19%),
-        radial-gradient(circle at 90% 15%, rgba(191,191,191,.35) 0 14%, rgba(255,255,255,0) 15%);
+        radial-gradient(circle at 12% 20%, rgba(201,151,43,.38) 0 24%, rgba(255,255,255,0) 25%),
+        radial-gradient(circle at 30% 75%, rgba(255,248,235,.38) 0 20%, rgba(255,255,255,0) 21%),
+        radial-gradient(circle at 55% 30%, rgba(241,209,138,.35) 0 22%, rgba(255,255,255,0) 23%),
+        radial-gradient(circle at 80% 60%, rgba(201,151,43,.30) 0 18%, rgba(255,255,255,0) 19%),
+        radial-gradient(circle at 90% 15%, rgba(255,255,255,.28) 0 14%, rgba(255,255,255,0) 15%);
       animation: bubblesFloat 5s ease-in-out infinite alternate;
     }
 
@@ -71,11 +74,11 @@
       z-index:-2;
       pointer-events:none;
       background:
-        radial-gradient(circle at 18% 55%, rgba(201,151,43,.30) 0 10%, rgba(255,255,255,0) 11%),
-        radial-gradient(circle at 35% 40%, rgba(241,209,138,.26) 0 12%, rgba(255,255,255,0) 13%),
-        radial-gradient(circle at 48% 85%, rgba(191,191,191,.28) 0 9%, rgba(255,255,255,0) 10%),
-        radial-gradient(circle at 70% 22%, rgba(201,151,43,.25) 0 11%, rgba(255,255,255,0) 12%),
-        radial-gradient(circle at 85% 70%, rgba(241,209,138,.24) 0 10%, rgba(255,255,255,0) 11%);
+        radial-gradient(circle at 18% 55%, rgba(201,151,43,.22) 0 10%, rgba(255,255,255,0) 11%),
+        radial-gradient(circle at 35% 40%, rgba(241,209,138,.20) 0 12%, rgba(255,255,255,0) 13%),
+        radial-gradient(circle at 48% 85%, rgba(255,248,235,.22) 0 9%, rgba(255,255,255,0) 10%),
+        radial-gradient(circle at 70% 22%, rgba(201,151,43,.18) 0 11%, rgba(255,255,255,0) 12%),
+        radial-gradient(circle at 85% 70%, rgba(255,255,255,.18) 0 10%, rgba(255,255,255,0) 11%);
       animation: bubblesFloat2 4s ease-in-out infinite alternate;
       mix-blend-mode:multiply;
     }
@@ -237,5 +240,6 @@
   </script>
 </body>
 </html>
+
 
 
