@@ -65,7 +65,11 @@
     radial-gradient(circle at 55% 30%, rgba(241,209,138,.35) 0 22%, rgba(255,255,255,0) 23%),
     radial-gradient(circle at 80% 60%, rgba(201,151,43,.30) 0 18%, rgba(255,255,255,0) 19%),
     radial-gradient(circle at 90% 15%, rgba(255,255,255,.28) 0 14%, rgba(255,255,255,0) 15%);
-  animation: bubblesFloat 5s linear infinite;   /* ✅ sin alternate */
+
+  /* ✅ reemplaza animation por movimiento con variables */
+  transform: translate(calc(var(--bx1, 0) * 1%), calc(var(--by1, 0) * 1%)) scale(var(--bs1, 1));
+  transition: transform 1100ms ease-in-out;
+  will-change: transform;
 }
 
 .bubbles2{
@@ -79,8 +83,13 @@
     radial-gradient(circle at 48% 85%, rgba(255,248,235,.22) 0 9%, rgba(255,255,255,0) 10%),
     radial-gradient(circle at 70% 22%, rgba(201,151,43,.18) 0 11%, rgba(255,255,255,0) 12%),
     radial-gradient(circle at 85% 70%, rgba(255,255,255,.18) 0 10%, rgba(255,255,255,0) 11%);
-  animation: bubblesFloat2 3s linear infinite;  /* ✅ sin alternate */
+
   mix-blend-mode: soft-light;
+
+  /* ✅ reemplaza animation por movimiento con variables */
+  transform: translate(calc(var(--bx2, 0) * 1%), calc(var(--by2, 0) * 1%)) scale(var(--bs2, 1.02));
+  transition: transform 900ms ease-in-out;
+  will-change: transform;
 }
 
     .shimmer{
@@ -244,11 +253,49 @@
         console.error(e);
       }
     });
+
+    /* ✅ Movimiento NO predecible (random-walk) SOLO para burbujas */
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduceMotion) {
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+      const s1 = { x: 0, y: 0, sc: 1.00 };
+      const s2 = { x: 0, y: 0, sc: 1.02 };
+
+      function step(state, maxStep, maxPos, scMin, scMax){
+        const dx = (Math.random() * 2 - 1) * maxStep;
+        const dy = (Math.random() * 2 - 1) * maxStep;
+
+        state.x = clamp(state.x + dx, -maxPos, maxPos);
+        state.y = clamp(state.y + dy, -maxPos, maxPos);
+
+        const dsc = (Math.random() * 2 - 1) * 0.01;
+        state.sc = clamp(state.sc + dsc, scMin, scMax);
+      }
+
+      function apply(){
+        document.documentElement.style.setProperty("--bx1", s1.x.toFixed(2));
+        document.documentElement.style.setProperty("--by1", s1.y.toFixed(2));
+        document.documentElement.style.setProperty("--bs1", s1.sc.toFixed(3));
+
+        document.documentElement.style.setProperty("--bx2", s2.x.toFixed(2));
+        document.documentElement.style.setProperty("--by2", s2.y.toFixed(2));
+        document.documentElement.style.setProperty("--bs2", s2.sc.toFixed(3));
+      }
+
+      apply();
+
+      // Tiempos desincronizados para evitar patrón
+      setInterval(() => {
+        step(s1, 1.6, 7, 0.98, 1.06);
+        apply();
+      }, 1150);
+
+      setInterval(() => {
+        step(s2, 1.2, 6, 1.00, 1.08);
+        apply();
+      }, 930);
+    }
   </script>
 </body>
 </html>
-
-
-
-
-
