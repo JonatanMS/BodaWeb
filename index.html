@@ -166,15 +166,17 @@
     }
 
     /* ===== MÓVIL ===== */
-    @media (max-width: 420px){
-      .card{
-        width: 92vw;
-        padding: 60px 30px;   /* más “largo” vertical como pediste */
-      }
-      .text{ letter-spacing: 1.6px; }
-      .bow{max-width: 100%; /* <- en móvil, que no exceda el card */ }
-      .jv-logo img{ width: 260px; }
-    }
+@media (max-width: 420px){
+  .card{
+    width: 92vw;
+    padding: 32px 18px;   /* ⬅ más compacto */
+  }
+
+  .text{ letter-spacing: 1.6px; }
+  .bow{ max-width: 100%; }
+
+  .jv-logo img{ width: 240px; } /* opcional, un poco más elegante */
+}
 
     @media (prefers-reduced-motion: reduce){
       .bg-base, .bubbles, .bubbles2, .shimmer{ animation:none; }
@@ -222,6 +224,7 @@
   </script>
 </body>
 </html>
+
 
 
 
