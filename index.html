@@ -32,24 +32,18 @@
       min-height:100dvh;
 
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-
-      /* ✅ IMPORTANTE: el fondo lo pone .bg-base, aquí lo dejamos transparente
-         para evitar problemas de stacking con z-index negativos */
-      background: transparent;
-
+      background:#fff;
       overflow:hidden;
       padding:18px;
       text-align:center;
       color:#222;
-
-      /* ✅ crea un stacking context limpio */
-      position: relative;
+      position:relative;
     }
 
     .bg-base{
       position:fixed;
       inset:0;
-      z-index:0; /* ✅ antes -4 */
+      z-index:0;
       background: linear-gradient(135deg,
         #ffffff 0%,
         #fff6e6 25%,
@@ -61,68 +55,21 @@
       pointer-events:none;
     }
 
-    .bubbles{
+    /* ✅ NUEVO: Canvas de burbujas (full viewport real) */
+    #bubblesCanvas{
       position:fixed;
       inset:0;
-      z-index:1; /* ✅ antes -3 */
+      z-index:1;
       pointer-events:none;
-      overflow:hidden;
-    }
-
-    .bubbles2{
-      position:fixed;
-      inset:0;
-      z-index:2; /* ✅ antes -2 */
-      pointer-events:none;
-      overflow:hidden;
+      /* look “soft” similar a tus layers */
       mix-blend-mode: soft-light;
       filter: saturate(1.05) contrast(1.06);
-    }
-
-    .bubble{
-      position:absolute;
-      border-radius:999px;
-      pointer-events:none;
-      will-change: transform;
-      transform: translate3d(0,0,0);
-
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,.08),
-        inset 0 18px 30px rgba(255,255,255,.10),
-        0 8px 22px rgba(0,0,0,.06);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
-    }
-
-    .bubble.gold{
-      background: radial-gradient(circle at 30% 30%,
-        rgba(255,255,255,.55) 0%,
-        rgba(241,209,138,.45) 30%,
-        rgba(201,151,43,.35) 62%,
-        rgba(160,115,25,.18) 78%,
-        rgba(255,255,255,0) 100%);
-      filter: saturate(1.12) brightness(1.03);
-    }
-
-    .bubble.cream{
-      background: radial-gradient(circle at 30% 30%,
-        rgba(255,255,255,.42) 0%,
-        var(--bCream) 58%,
-        rgba(255,255,255,0) 100%);
-    }
-
-    .bubble.white{
-      background: radial-gradient(circle at 30% 30%,
-        rgba(255,255,255,.35) 0%,
-        var(--bWhite) 62%,
-        rgba(255,255,255,0) 100%);
     }
 
     .shimmer{
       position:fixed;
       inset:-25%;
-      z-index:3; /* ✅ antes -1 */
+      z-index:2;
       pointer-events:none;
       background: linear-gradient(115deg,
         rgba(255,255,255,0) 0%,
@@ -146,6 +93,7 @@
       100%{ transform:translateX(45%) rotate(6deg); }
     }
 
+    /* ✅ portada: SOLO la imagen Sobre.png */
     .cover{
       width: min(720px, 92vw);
       max-height: 86svh;
@@ -180,7 +128,7 @@
       position: relative;
       display: grid;
       place-items: center;
-      z-index:10; /* ✅ asegura que esté encima de las burbujas */
+      z-index:10; /* ✅ arriba del canvas */
     }
 
     .hint{
@@ -216,16 +164,18 @@
         letter-spacing: 1.2px;
       }
     }
-
   </style>
 </head>
 
 <body>
   <div class="bg-base"></div>
-  <div class="bubbles"></div>
-  <div class="bubbles2"></div>
+
+  <!-- ✅ NUEVO: burbujas en canvas -->
+  <canvas id="bubblesCanvas"></canvas>
+
   <div class="shimmer"></div>
 
+  <!-- ✅ SOLO IMAGEN. Click = música -->
   <div class="cover-wrap">
     <img src="assets/Sobre.png" alt="Sobre" class="cover" id="cover" />
     <div class="hint" id="hint">Toca el sobre para abrir</div>
@@ -245,6 +195,7 @@
       try {
         const hint = document.getElementById("hint");
         if (hint) hint.style.display = "none";
+
         if (!music.paused) return;
         await music.play();
       } catch (e) {
@@ -252,130 +203,184 @@
       }
     });
 
+    /* =========================================================
+       ✅ Burbujas en Canvas: rebote 100% estable (sin “mitad”)
+       ========================================================= */
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduceMotion) {
-      const layer1 = document.querySelector(".bubbles");
-      const layer2 = document.querySelector(".bubbles2");
 
-      const SPEED_1 = 26;
-      const SPEED_2 = 18;
+    if (!reduceMotion) {
+      const canvas = document.getElementById("bubblesCanvas");
+      const ctx = canvas.getContext("2d", { alpha:true });
 
       function rand(min, max){ return Math.random() * (max - min) + min; }
 
-      function makeBubble(parent, kind, sizeMin, sizeMax, opMin, opMax){
-        const el = document.createElement("span");
-        el.className = `bubble ${kind}`;
-        parent.appendChild(el);
+      // Dimensiones reales del viewport (robusto en WebViews)
+      function getVP(){
+        const vv = window.visualViewport;
+        const w = Math.round(vv ? vv.width  : document.documentElement.clientWidth);
+        const h = Math.round(vv ? vv.height : document.documentElement.clientHeight);
+        return { w, h };
+      }
 
-        const size = rand(sizeMin, sizeMax);
-        el.style.width = `${size}px`;
-        el.style.height = `${size}px`;
+      let vp = getVP();
+      let dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1)); // cap para rendimiento
 
-        let op = rand(opMin, opMax);
-        if (kind === "gold") op = Math.min(0.70, op * 1.25);
-        if (kind === "white") op = op * 0.90;
-        el.style.opacity = op.toFixed(2);
+      function resizeCanvas(){
+        vp = getVP();
+        dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
 
-        const b = {
-          el,
+        canvas.style.width = vp.w + "px";
+        canvas.style.height = vp.h + "px";
+
+        canvas.width = Math.floor(vp.w * dpr);
+        canvas.height = Math.floor(vp.h * dpr);
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // dibujar en CSS px
+      }
+
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas, { passive:true });
+      window.addEventListener("orientationchange", resizeCanvas, { passive:true });
+      if (window.visualViewport){
+        window.visualViewport.addEventListener("resize", resizeCanvas, { passive:true });
+        window.visualViewport.addEventListener("scroll", resizeCanvas, { passive:true });
+      }
+
+      // Configuración de burbujas (simula tus 2 layers)
+      const bubbles = [];
+      const COUNT = 18;
+
+      function makeBubble(){
+        // tamaños similares a los tuyos
+        const size = rand(60, 200);
+
+        // tipo: gold / cream / white
+        const r = Math.random();
+        const kind = (r < 0.34) ? "gold" : (r < 0.67) ? "cream" : "white";
+
+        // opacidades parecidas a tu setup
+        let alpha = (kind === "gold") ? rand(0.24, 0.55) : (kind === "cream") ? rand(0.18, 0.42) : rand(0.14, 0.36);
+
+        // velocidad
+        const angle = rand(0, Math.PI * 2);
+        const speed = rand(10, 26); // px/s base (luego metemos steering)
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+
+        return {
+          kind,
           size,
-          px: 0,
-          py: 0,
-          vx: rand(-1, 1),
-          vy: rand(-1, 1),
-          ax: 0,
-          ay: 0,
-          steerLeft: rand(0.6, 1.4)
+          x: rand(0, Math.max(0, vp.w - size)),
+          y: rand(0, Math.max(0, vp.h - size)),
+          vx, vy,
+          ax: 0, ay: 0,
+          steerLeft: rand(0.6, 1.4),
+          alpha
         };
-
-        const mag = Math.hypot(b.vx, b.vy) || 1;
-        b.vx /= mag; b.vy /= mag;
-
-        return b;
       }
 
-      /* ✅ FIX: usar layout viewport real (más estable en WebViews) */
-      function viewportBounds(){
-        const root = document.documentElement;
-        return { w: root.clientWidth, h: root.clientHeight };
-      }
+      for (let i=0; i<COUNT; i++) bubbles.push(makeBubble());
 
-      function setup(parent, count, palette, sizeMin, sizeMax, opMin, opMax, W, H){
-        const arr = [];
-        for (let i=0; i<count; i++){
-          const kind = palette[(Math.random() * palette.length) | 0];
-          const b = makeBubble(parent, kind, sizeMin, sizeMax, opMin, opMax);
-          b.px = rand(0, Math.max(0, W - b.size));
-          b.py = rand(0, Math.max(0, H - b.size));
-          arr.push(b);
-        }
-        return arr;
-      }
-
-      let b1 = viewportBounds();
-      let b2 = viewportBounds();
-
-      const bubbles1 = setup(layer1, 10, ["gold","cream","white"], 80, 200, 0.24, 0.46, b1.w, b1.h);
-      const bubbles2 = setup(layer2, 8,  ["gold","cream","white"], 60, 160, 0.18, 0.36, b2.w, b2.h);
-
-      function clampAll(){
-        for (const b of bubbles1){
-          b.px = Math.min(b.px, Math.max(0, b1.w - b.size));
-          b.py = Math.min(b.py, Math.max(0, b1.h - b.size));
-        }
-        for (const b of bubbles2){
-          b.px = Math.min(b.px, Math.max(0, b2.w - b.size));
-          b.py = Math.min(b.py, Math.max(0, b2.h - b.size));
+      function clampToNewViewport(){
+        for (const b of bubbles){
+          b.x = Math.min(b.x, Math.max(0, vp.w - b.size));
+          b.y = Math.min(b.y, Math.max(0, vp.h - b.size));
         }
       }
 
-      function onResizeLike(){
-        b1 = viewportBounds();
-        b2 = viewportBounds();
-        clampAll();
+      // si cambia tamaño, clamp
+      const oldResize = resizeCanvas;
+      function resizeCanvasAndClamp(){
+        oldResize();
+        clampToNewViewport();
       }
-
-      window.addEventListener("resize", onResizeLike, { passive:true });
-      window.addEventListener("orientationchange", onResizeLike, { passive:true });
+      // reemplazar listeners con clamp (sin duplicar)
+      window.removeEventListener("resize", resizeCanvas);
+      window.addEventListener("resize", resizeCanvasAndClamp, { passive:true });
 
       let last = performance.now();
+
+      function drawBubble(b){
+        const x = b.x + b.size * 0.5;
+        const y = b.y + b.size * 0.5;
+        const r = b.size * 0.5;
+
+        // gradiente con highlight tipo “burbuja”
+        const hx = x - r * 0.22;
+        const hy = y - r * 0.22;
+
+        const g = ctx.createRadialGradient(hx, hy, r * 0.10, x, y, r);
+
+        if (b.kind === "gold"){
+          g.addColorStop(0.00, `rgba(255,255,255,${0.42 * b.alpha})`);
+          g.addColorStop(0.30, `rgba(241,209,138,${0.55 * b.alpha})`);
+          g.addColorStop(0.62, `rgba(201,151,43,${0.58 * b.alpha})`);
+          g.addColorStop(0.80, `rgba(160,115,25,${0.22 * b.alpha})`);
+          g.addColorStop(1.00, `rgba(255,255,255,0)`);
+        } else if (b.kind === "cream"){
+          g.addColorStop(0.00, `rgba(255,255,255,${0.35 * b.alpha})`);
+          g.addColorStop(0.60, `rgba(255,248,235,${0.65 * b.alpha})`);
+          g.addColorStop(1.00, `rgba(255,255,255,0)`);
+        } else {
+          g.addColorStop(0.00, `rgba(255,255,255,${0.28 * b.alpha})`);
+          g.addColorStop(0.62, `rgba(255,255,255,${0.22 * b.alpha})`);
+          g.addColorStop(1.00, `rgba(255,255,255,0)`);
+        }
+
+        // “rim” y sombra suave (similar a tu box-shadow)
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // borde sutil
+        ctx.strokeStyle = `rgba(255,255,255,${0.12 * b.alpha})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
 
       function tick(now){
         const dt = Math.min(0.033, (now - last) / 1000);
         last = now;
 
-        function update(arr, speed, BW, BH){
-          for (const b of arr){
-            b.steerLeft -= dt;
-            if (b.steerLeft <= 0){
-              b.steerLeft = rand(0.6, 1.4);
-              b.ax = rand(-0.9, 0.9);
-              b.ay = rand(-0.9, 0.9);
-            }
+        // limpiar
+        ctx.clearRect(0, 0, vp.w, vp.h);
 
-            b.vx += b.ax * dt * 0.6;
-            b.vy += b.ay * dt * 0.6;
-
-            const mag = Math.hypot(b.vx, b.vy) || 1;
-            b.vx /= mag; b.vy /= mag;
-
-            b.px += b.vx * speed * dt;
-            b.py += b.vy * speed * dt;
-
-            const maxX = Math.max(0, BW - b.size);
-            const maxY = Math.max(0, BH - b.size);
-
-            if (b.px <= 0){ b.px = 0; b.vx = Math.abs(b.vx); }
-            if (b.px >= maxX){ b.px = maxX; b.vx = -Math.abs(b.vx); }
-            if (b.py <= 0){ b.py = 0; b.vy = Math.abs(b.vy); }
-            if (b.py >= maxY){ b.py = maxY; b.vy = -Math.abs(b.vy); }
-
-            b.el.style.transform = `translate3d(${b.px}px, ${b.py}px, 0)`;
+        // update + draw
+        for (const b of bubbles){
+          // steering suave (como tu ax/ay)
+          b.steerLeft -= dt;
+          if (b.steerLeft <= 0){
+            b.steerLeft = rand(0.6, 1.4);
+            b.ax = rand(-18, 18); // aceleración px/s²
+            b.ay = rand(-18, 18);
           }
-        }
 
-        update(bubbles1, SPEED_1, b1.w, b1.h);
-        update(bubbles2, SPEED_2, b2.w, b2.h);
+          b.vx += b.ax * dt;
+          b.vy += b.ay * dt;
+
+          // limitar velocidad
+          const vmax = 32;
+          const v = Math.hypot(b.vx, b.vy) || 1;
+          if (v > vmax){
+            b.vx = (b.vx / v) * vmax;
+            b.vy = (b.vy / v) * vmax;
+          }
+
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+
+          const maxX = Math.max(0, vp.w - b.size);
+          const maxY = Math.max(0, vp.h - b.size);
+
+          // ✅ rebote real contra bordes del viewport
+          if (b.x <= 0){ b.x = 0; b.vx = Math.abs(b.vx); }
+          if (b.x >= maxX){ b.x = maxX; b.vx = -Math.abs(b.vx); }
+          if (b.y <= 0){ b.y = 0; b.vy = Math.abs(b.vy); }
+          if (b.y >= maxY){ b.y = maxY; b.vy = -Math.abs(b.vy); }
+
+          drawBubble(b);
+        }
 
         requestAnimationFrame(tick);
       }
