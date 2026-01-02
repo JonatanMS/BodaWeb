@@ -147,32 +147,30 @@
     }
 
     /* ✅ NUEVO: la portada ahora es SOLO la imagen Sobre.png */
-    .cover{
-      width: min(720px, 92vw);
-      /* evita que se “pase” en pantallas cortas */
-      max-height: 86svh;
-      max-height: 86dvh;
-      height: auto;
+.cover{
+  width: min(720px, 92vw);
+  max-height: 86svh;
+  max-height: 86dvh;
+  height: auto;
 
-      display:block;
-      cursor:pointer;
-      user-select:none;
-      -webkit-user-drag:none;
+  display:block;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-drag:none;
 
-      /* look premium sin usar .card */
-      filter: drop-shadow(0 18px 35px rgba(0,0,0,.16));
-      transition: transform .25s ease, filter .25s ease;
-    }
+  filter: drop-shadow(0 18px 35px rgba(0,0,0,.16));
+  transition: transform .25s ease, filter .25s ease;
+}
 
-    .cover:hover{
-      transform: scale(1.01);
-      filter: drop-shadow(0 22px 44px rgba(0,0,0,.18));
-    }
+/* ✅ SOLO ESCRITORIO: más grande para que no se vea “angosta” */
+@media (min-width: 900px){
+  .cover{
+    width: min(980px, 70vw);   /* más presencia en web */
+    max-height: 88vh;          /* mantiene proporción sin “aplastar” */
+  }
+}
 
-    .cover:active{
-      transform: scale(0.995);
-    }
-
+/* móvil queda igual */
 @media (max-width: 520px){
   .cover{
     width: 92vw;
@@ -181,11 +179,6 @@
   }
 }
 
-    @media (prefers-reduced-motion: reduce){
-      .bg-base, .bubbles, .bubbles2, .shimmer{ animation:none; }
-      .bubble{ display:none; }
-      .cover{ transition:none; }
-    }
   </style>
 </head>
 
@@ -324,3 +317,4 @@
   </script>
 </body>
 </html>
+
