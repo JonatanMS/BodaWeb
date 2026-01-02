@@ -32,33 +32,24 @@
       min-height:100dvh;
 
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:#fff;
+
+      /* ✅ IMPORTANTE: el fondo lo pone .bg-base, aquí lo dejamos transparente
+         para evitar problemas de stacking con z-index negativos */
+      background: transparent;
+
       overflow:hidden;
       padding:18px;
       text-align:center;
       color:#222;
-    }
 
-    /* =========================================================
-       ✅ FIX REAL (para rebote "a la mitad"):
-       Evitamos z-index NEGATIVO + fixed (en algunos WebViews hace
-       que el "área" efectiva sea rara). Metemos todo en #fx
-       fijo al viewport y con z-index POSITIVO.
-       ========================================================= */
-    #fx{
-      position:fixed;
-      left:0; top:0;
-      width:100vw;
-      height:100vh;
-      pointer-events:none;
-      overflow:hidden;
-      z-index:0; /* ✅ ya NO usamos negativos */
+      /* ✅ crea un stacking context limpio */
+      position: relative;
     }
 
     .bg-base{
-      position:absolute;
+      position:fixed;
       inset:0;
-      z-index:0;
+      z-index:0; /* ✅ antes -4 */
       background: linear-gradient(135deg,
         #ffffff 0%,
         #fff6e6 25%,
@@ -67,39 +58,25 @@
         #ffffff 100%);
       background-size:300% 300%;
       animation: baseMove 7s ease-in-out infinite;
+      pointer-events:none;
     }
 
     .bubbles{
-      position:absolute;
+      position:fixed;
       inset:0;
-      z-index:1;
+      z-index:1; /* ✅ antes -3 */
       pointer-events:none;
       overflow:hidden;
     }
 
     .bubbles2{
-      position:absolute;
+      position:fixed;
       inset:0;
-      z-index:2;
+      z-index:2; /* ✅ antes -2 */
       pointer-events:none;
       overflow:hidden;
       mix-blend-mode: soft-light;
       filter: saturate(1.05) contrast(1.06);
-    }
-
-    .shimmer{
-      position:absolute;
-      inset:-25%;
-      z-index:3;
-      pointer-events:none;
-      background: linear-gradient(115deg,
-        rgba(255,255,255,0) 0%,
-        rgba(241,209,138,.65) 45%,
-        rgba(255,255,255,0) 60%
-      );
-      filter: blur(10px);
-      opacity:.5;
-      animation: shimmerMove 7s ease-in-out infinite;
     }
 
     .bubble{
@@ -142,6 +119,21 @@
         rgba(255,255,255,0) 100%);
     }
 
+    .shimmer{
+      position:fixed;
+      inset:-25%;
+      z-index:3; /* ✅ antes -1 */
+      pointer-events:none;
+      background: linear-gradient(115deg,
+        rgba(255,255,255,0) 0%,
+        rgba(241,209,138,.65) 45%,
+        rgba(255,255,255,0) 60%
+      );
+      filter: blur(10px);
+      opacity:.5;
+      animation: shimmerMove 7s ease-in-out infinite;
+    }
+
     @keyframes baseMove{
       0%{ background-position:0% 50%; }
       50%{ background-position:100% 50%; }
@@ -154,7 +146,6 @@
       100%{ transform:translateX(45%) rotate(6deg); }
     }
 
-    /* ✅ portada: SOLO la imagen Sobre.png */
     .cover{
       width: min(720px, 92vw);
       max-height: 86svh;
@@ -189,7 +180,7 @@
       position: relative;
       display: grid;
       place-items: center;
-      z-index:2; /* ✅ encima del #fx */
+      z-index:10; /* ✅ asegura que esté encima de las burbujas */
     }
 
     .hint{
@@ -225,19 +216,16 @@
         letter-spacing: 1.2px;
       }
     }
+
   </style>
 </head>
 
 <body>
-  <!-- ✅ Fondo/burbujas dentro de un contenedor fijo estable -->
-  <div id="fx">
-    <div class="bg-base"></div>
-    <div class="bubbles"></div>
-    <div class="bubbles2"></div>
-    <div class="shimmer"></div>
-  </div>
+  <div class="bg-base"></div>
+  <div class="bubbles"></div>
+  <div class="bubbles2"></div>
+  <div class="shimmer"></div>
 
-  <!-- ✅ SOLO IMAGEN. Click = música -->
   <div class="cover-wrap">
     <img src="assets/Sobre.png" alt="Sobre" class="cover" id="cover" />
     <div class="hint" id="hint">Toca el sobre para abrir</div>
@@ -264,12 +252,10 @@
       }
     });
 
-    /* ✅ burbujas independientes */
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!reduceMotion) {
-      const fx = document.getElementById("fx");
-      const layer1 = fx.querySelector(".bubbles");
-      const layer2 = fx.querySelector(".bubbles2");
+      const layer1 = document.querySelector(".bubbles");
+      const layer2 = document.querySelector(".bubbles2");
 
       const SPEED_1 = 26;
       const SPEED_2 = 18;
@@ -304,67 +290,53 @@
 
         const mag = Math.hypot(b.vx, b.vy) || 1;
         b.vx /= mag; b.vy /= mag;
+
         return b;
       }
 
-      /* ✅ FIX: tomar medidas del CONTENEDOR real (fx) y además
-         sincronizar con visualViewport para WebViews (WhatsApp/IG/Samsung)
-      */
-      function getVP(){
-        const vv = window.visualViewport;
-        const w = Math.round(vv ? vv.width  : window.innerWidth);
-        const h = Math.round(vv ? vv.height : window.innerHeight);
-        return { w, h };
+      /* ✅ FIX: usar layout viewport real (más estable en WebViews) */
+      function viewportBounds(){
+        const root = document.documentElement;
+        return { w: root.clientWidth, h: root.clientHeight };
       }
 
-      let B = getVP();
-
-      function syncFX(){
-        B = getVP();
-
-        // “Clava” el tamaño en px para que el área de rebote sea exacta
-        fx.style.width = B.w + "px";
-        fx.style.height = B.h + "px";
-      }
-
-      function setup(parent, count, palette, sizeMin, sizeMax, opMin, opMax){
+      function setup(parent, count, palette, sizeMin, sizeMax, opMin, opMax, W, H){
         const arr = [];
         for (let i=0; i<count; i++){
           const kind = palette[(Math.random() * palette.length) | 0];
           const b = makeBubble(parent, kind, sizeMin, sizeMax, opMin, opMax);
-          b.px = rand(0, Math.max(0, B.w - b.size));
-          b.py = rand(0, Math.max(0, B.h - b.size));
+          b.px = rand(0, Math.max(0, W - b.size));
+          b.py = rand(0, Math.max(0, H - b.size));
           arr.push(b);
         }
         return arr;
       }
 
-      syncFX();
+      let b1 = viewportBounds();
+      let b2 = viewportBounds();
 
-      const bubbles1 = setup(layer1, 10, ["gold","cream","white"], 80, 200, 0.24, 0.46);
-      const bubbles2 = setup(layer2, 8,  ["gold","cream","white"], 60, 160, 0.18, 0.36);
+      const bubbles1 = setup(layer1, 10, ["gold","cream","white"], 80, 200, 0.24, 0.46, b1.w, b1.h);
+      const bubbles2 = setup(layer2, 8,  ["gold","cream","white"], 60, 160, 0.18, 0.36, b2.w, b2.h);
 
       function clampAll(){
         for (const b of bubbles1){
-          b.px = Math.min(b.px, Math.max(0, B.w - b.size));
-          b.py = Math.min(b.py, Math.max(0, B.h - b.size));
+          b.px = Math.min(b.px, Math.max(0, b1.w - b.size));
+          b.py = Math.min(b.py, Math.max(0, b1.h - b.size));
         }
         for (const b of bubbles2){
-          b.px = Math.min(b.px, Math.max(0, B.w - b.size));
-          b.py = Math.min(b.py, Math.max(0, B.h - b.size));
+          b.px = Math.min(b.px, Math.max(0, b2.w - b.size));
+          b.py = Math.min(b.py, Math.max(0, b2.h - b.size));
         }
       }
 
       function onResizeLike(){
-        syncFX();
+        b1 = viewportBounds();
+        b2 = viewportBounds();
         clampAll();
       }
 
       window.addEventListener("resize", onResizeLike, { passive:true });
-      if (window.visualViewport){
-        window.visualViewport.addEventListener("resize", onResizeLike, { passive:true });
-        window.visualViewport.addEventListener("scroll",  onResizeLike, { passive:true });
-      }
+      window.addEventListener("orientationchange", onResizeLike, { passive:true });
 
       let last = performance.now();
 
@@ -372,10 +344,7 @@
         const dt = Math.min(0.033, (now - last) / 1000);
         last = now;
 
-        function update(arr, speed){
-          const BW = B.w;
-          const BH = B.h;
-
+        function update(arr, speed, BW, BH){
           for (const b of arr){
             b.steerLeft -= dt;
             if (b.steerLeft <= 0){
@@ -405,8 +374,8 @@
           }
         }
 
-        update(bubbles1, SPEED_1);
-        update(bubbles2, SPEED_2);
+        update(bubbles1, SPEED_1, b1.w, b1.h);
+        update(bubbles2, SPEED_2, b2.w, b2.h);
 
         requestAnimationFrame(tick);
       }
