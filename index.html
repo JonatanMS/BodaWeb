@@ -16,11 +16,7 @@
     *{ box-sizing:border-box; }
     img{ max-width:100%; height:auto; }
 
-    html, body{
-      width:100%;
-      height:100%;
-      margin:0;
-    }
+    html, body{ width:100%; height:100%; margin:0; }
 
     body{
       display:grid;
@@ -54,7 +50,6 @@
       pointer-events:none;
     }
 
-    /* ✅ Canvas visible */
     #bubblesCanvas{
       position:fixed;
       inset:0;
@@ -62,9 +57,11 @@
       pointer-events:none;
 
       display:block;
-      opacity:0.90;
+      opacity:0.92;
       mix-blend-mode: normal;
-      filter: saturate(1.10) contrast(1.10);
+
+      /* ✅ un poco menos saturado para que el gold no “grite” */
+      filter: saturate(1.06) contrast(1.10);
     }
 
     .shimmer{
@@ -87,7 +84,6 @@
       50%{ background-position:100% 50%; }
       100%{ background-position:0% 50%; }
     }
-
     @keyframes shimmerMove{
       0%{ transform:translateX(-40%) rotate(6deg); }
       50%{ transform:translateX(10%) rotate(6deg); }
@@ -110,18 +106,10 @@
     }
 
     @media (min-width: 900px){
-      .cover{
-        width: clamp(468px, 34vw, 684px);
-        max-height: 82vh;
-      }
+      .cover{ width: clamp(468px, 34vw, 684px); max-height: 82vh; }
     }
-
     @media (max-width: 520px){
-      .cover{
-        width: 92vw;
-        max-height: 84svh;
-        max-height: 84dvh;
-      }
+      .cover{ width: 92vw; max-height: 84svh; max-height: 84dvh; }
     }
 
     .cover-wrap{
@@ -158,11 +146,7 @@
     }
 
     @media (max-width: 520px){
-      .hint{
-        bottom: 7%;
-        font-size: .95rem;
-        letter-spacing: 1.2px;
-      }
+      .hint{ bottom: 7%; font-size: .95rem; letter-spacing: 1.2px; }
     }
   </style>
 </head>
@@ -177,7 +161,6 @@
     <div class="hint" id="hint">Toca el sobre para abrir</div>
   </div>
 
-  <!-- ✅ MÚSICA: sin mover ni cambiar rutas -->
   <audio id="bg-music" preload="auto">
     <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
     Tu navegador no soporta audio.
@@ -219,14 +202,18 @@
       const bubbles = [];
       const COUNT = 18;
 
+      // ✅ Ajustables rápido:
+      const GOLD_PROB = 0.22; // 0.22 = 22% gold (sube a 0.30 si quieres más)
+      const GOLD_A_MIN = 0.24;
+      const GOLD_A_MAX = 0.46;
+
       function resizeCanvas(){
         vp = getVP();
         dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
 
         canvas.style.width = vp.w + "px";
         canvas.style.height = vp.h + "px";
-
-        canvas.width = Math.floor(vp.w * dpr);
+        canvas.width  = Math.floor(vp.w * dpr);
         canvas.height = Math.floor(vp.h * dpr);
 
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -239,26 +226,25 @@
 
       function makeBubble(){
         const size = rand(60, 200);
-        const r = Math.random();
-        const kind = (r < 0.34) ? "gold" : (r < 0.67) ? "cream" : "white";
 
-        /* ✅ CAMBIO: GOLD mucho más sutil */
+        const r = Math.random();
+        const kind = (r < GOLD_PROB) ? "gold" : (r < (GOLD_PROB + 0.39)) ? "cream" : "white";
+
         let alpha;
-        if (kind === "gold") alpha = rand(0.18, 0.38);   // ✅ antes estaba alta
-        else if (kind === "cream") alpha = rand(0.35, 0.70);
-        else alpha = rand(0.28, 0.60);
+        if (kind === "gold") alpha = rand(GOLD_A_MIN, GOLD_A_MAX);      // ✅ gold visible / distinguible
+        else if (kind === "cream") alpha = rand(0.34, 0.70);
+        else alpha = rand(0.26, 0.60);
 
         const angle = rand(0, Math.PI * 2);
         const speed = rand(10, 26);
-        const vx = Math.cos(angle) * speed;
-        const vy = Math.sin(angle) * speed;
 
         return {
           kind,
           size,
           x: rand(0, Math.max(0, vp.w - size)),
           y: rand(0, Math.max(0, vp.h - size)),
-          vx, vy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
           ax: 0, ay: 0,
           steerLeft: rand(0.6, 1.4),
           alpha
@@ -273,19 +259,41 @@
         const y = b.y + b.size * 0.5;
         const r = b.size * 0.5;
 
-        const hx = x - r * 0.22;
-        const hy = y - r * 0.22;
-
-        const g = ctx.createRadialGradient(hx, hy, r * 0.10, x, y, r);
+        // highlight para “solidez”
+        const hx = x - r * 0.24;
+        const hy = y - r * 0.24;
 
         if (b.kind === "gold"){
-          /* ✅ CAMBIO: gold menos “sólida”, más clara y menos saturada */
-          g.addColorStop(0.00, `rgba(255,255,255,${0.55 * b.alpha})`);
-          g.addColorStop(0.32, `rgba(241,209,138,${0.45 * b.alpha})`);
-          g.addColorStop(0.62, `rgba(201,151,43,${0.38 * b.alpha})`);
-          g.addColorStop(0.82, `rgba(201,151,43,${0.14 * b.alpha})`);
+          // ✅ Base champagne (para que se vea "sólida" pero NO demasiado amarilla)
+          ctx.fillStyle = `rgba(241,209,138,${0.22 * b.alpha})`;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+
+          // ✅ Highlight blanco al centro (para distinguir)
+          const g = ctx.createRadialGradient(hx, hy, r * 0.06, x, y, r);
+          g.addColorStop(0.00, `rgba(255,255,255,${0.85 * b.alpha})`);  // brillo blanco
+          g.addColorStop(0.16, `rgba(255,255,255,${0.28 * b.alpha})`);
+          g.addColorStop(0.38, `rgba(241,209,138,${0.62 * b.alpha})`);  // champagne
+          g.addColorStop(0.70, `rgba(201,151,43,${0.32 * b.alpha})`);   // dorado suave
+          g.addColorStop(0.86, `rgba(201,151,43,${0.14 * b.alpha})`);
           g.addColorStop(1.00, `rgba(255,255,255,0)`);
-        } else if (b.kind === "cream"){
+
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = `rgba(255,255,255,${0.22 * b.alpha})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          return;
+        }
+
+        // cream / white (igual que antes)
+        const g = ctx.createRadialGradient(hx, hy, r * 0.10, x, y, r);
+
+        if (b.kind === "cream"){
           g.addColorStop(0.00, `rgba(255,255,255,${0.55 * b.alpha})`);
           g.addColorStop(0.60, `rgba(255,248,235,${0.85 * b.alpha})`);
           g.addColorStop(1.00, `rgba(255,255,255,0)`);
