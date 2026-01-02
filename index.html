@@ -33,7 +33,7 @@
       min-height:100dvh;
 
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--white);
+      background: #fff;
       overflow:hidden;
       padding:18px;
       text-align:center;
@@ -165,8 +165,9 @@
 /* ✅ SOLO ESCRITORIO: más grande para que no se vea “angosta” */
 @media (min-width: 900px){
   .cover{
-    width: min(980px, 70vw);   /* más presencia en web */
-    max-height: 88vh;          /* mantiene proporción sin “aplastar” */
+    /* ✅ Desktop: más “chica” y balanceada (similar a tu zoom 50%) */
+    width: clamp(520px, 38vw, 760px);
+    max-height: 82vh;
   }
 }
 
@@ -317,4 +318,5 @@
   </script>
 </body>
 </html>
+
 
