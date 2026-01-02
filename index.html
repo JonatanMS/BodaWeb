@@ -92,12 +92,15 @@
       -webkit-backdrop-filter: blur(2px);
     }
 
+    /* ✅ AJUSTE: gold con highlight + “rim” para que no se pierda en el fondo */
     .bubble.gold{
       background: radial-gradient(circle at 30% 30%,
-        rgba(255,255,255,.38) 0%,
-        var(--bChamp) 35%,
-        var(--bGold) 72%,
+        rgba(255,255,255,.55) 0%,
+        rgba(241,209,138,.45) 30%,
+        rgba(201,151,43,.35) 62%,
+        rgba(160,115,25,.18) 78%,
         rgba(255,255,255,0) 100%);
+      filter: saturate(1.12) brightness(1.03);
     }
 
     .bubble.cream{
@@ -192,7 +195,7 @@
 }
 
 /* =========================
-   ✅ NUEVO: TEXTO CON RETRASO (3s)
+   ✅ NUEVO: TEXTO CON RETRASO (1s)
    ========================= */
 .cover-wrap{
   position: relative;
@@ -215,7 +218,7 @@
 
   opacity: 0;
   animation: hintIn .7s ease forwards;
-  animation-delay: .7s;
+  animation-delay: 1s;
 
   pointer-events: none;
   user-select: none;
@@ -291,7 +294,12 @@
         const size = rand(sizeMin, sizeMax);
         el.style.width = `${size}px`;
         el.style.height = `${size}px`;
-        el.style.opacity = rand(opMin, opMax).toFixed(2);
+
+        // ✅ NUEVO: opacidad por tipo (gold más visible, white un poco menos)
+        let op = rand(opMin, opMax);
+        if (kind === "gold") op = Math.min(0.70, op * 1.25);
+        if (kind === "white") op = op * 0.90;
+        el.style.opacity = op.toFixed(2);
 
         const b = {
           el,
@@ -323,7 +331,7 @@
         return arr;
       }
 
-      /* ✅ NUEVO: opacidades más visibles (mantiene look premium) */
+      /* ✅ 25 burbujas (14 + 11) y opacidades más visibles */
       const bubbles1 = setup(layer1, 14, ["gold","cream","white"], 80, 200, 0.24, 0.46);
       const bubbles2 = setup(layer2, 11, ["gold","cream","white"], 60, 160, 0.18, 0.36);
 
@@ -380,5 +388,3 @@
   </script>
 </body>
 </html>
-
-
