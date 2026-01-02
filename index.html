@@ -70,6 +70,9 @@
       pointer-events:none;
       overflow:hidden;
       mix-blend-mode: soft-light;
+
+      /* ✅ EXTRA PRO (muy leve): ayuda a que destaquen sin verse “fuertes” */
+      filter: saturate(1.05) contrast(1.06);
     }
 
     .bubble{
@@ -78,6 +81,15 @@
       pointer-events:none;
       will-change: transform;
       transform: translate3d(0,0,0);
+
+      /* ✅ NUEVO: contraste premium (borde + brillo + sombra suave) */
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.08),
+        inset 0 18px 30px rgba(255,255,255,.10),
+        0 8px 22px rgba(0,0,0,.06);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
     }
 
     .bubble.gold{
@@ -311,8 +323,9 @@
         return arr;
       }
 
-      const bubbles1 = setup(layer1, 10, ["gold","cream","white"], 80, 200, 0.18, 0.38);
-      const bubbles2 = setup(layer2,  8, ["gold","cream","white"], 60, 160, 0.12, 0.28);
+      /* ✅ NUEVO: opacidades más visibles (mantiene look premium) */
+      const bubbles1 = setup(layer1, 10, ["gold","cream","white"], 80, 200, 0.24, 0.46);
+      const bubbles2 = setup(layer2,  8, ["gold","cream","white"], 60, 160, 0.18, 0.36);
 
       let w = window.innerWidth, h = window.innerHeight;
       window.addEventListener("resize", () => {
@@ -367,6 +380,3 @@
   </script>
 </body>
 </html>
-
-
-
