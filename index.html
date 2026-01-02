@@ -321,24 +321,33 @@
 
       function setup(parent, count, palette, sizeMin, sizeMax, opMin, opMax){
         const arr = [];
+        const r = parent.getBoundingClientRect();  // ✅ FIX: bounds reales del layer
         for (let i=0; i<count; i++){
           const kind = palette[(Math.random() * palette.length) | 0];
           const b = makeBubble(parent, kind, sizeMin, sizeMax, opMin, opMax);
-          b.px = rand(0, Math.max(0, window.innerWidth - b.size));
-          b.py = rand(0, Math.max(0, window.innerHeight - b.size));
+          b.px = rand(0, Math.max(0, r.width  - b.size));  // ✅ FIX
+          b.py = rand(0, Math.max(0, r.height - b.size));  // ✅ FIX
           arr.push(b);
         }
         return arr;
       }
 
       /* ✅ 25 burbujas (14 + 11) y opacidades más visibles */
-      const bubbles1 = setup(layer1, 14, ["gold","cream","white"], 80, 200, 0.24, 0.46);
+      const bubbles1 = setup(layer1, 10, ["gold","cream","white"], 80, 200, 0.24, 0.46);
       const bubbles2 = setup(layer2, 8, ["gold","cream","white"], 60, 160, 0.18, 0.36);
 
-      let w = window.innerWidth, h = window.innerHeight;
+      /* ✅ FIX: usar bounds reales por capa (evita “recargadas a la derecha”) */
+      function bounds(el){
+        const r = el.getBoundingClientRect();
+        return { w: r.width, h: r.height };
+      }
+
+      let b1 = bounds(layer1);
+      let b2 = bounds(layer2);
+
       window.addEventListener("resize", () => {
-        w = window.innerWidth;
-        h = window.innerHeight;
+        b1 = bounds(layer1);
+        b2 = bounds(layer2);
       }, { passive:true });
 
       let last = performance.now();
@@ -347,7 +356,7 @@
         const dt = Math.min(0.033, (now - last) / 1000);
         last = now;
 
-        function update(arr, speed){
+        function update(arr, speed, BW, BH){
           for (const b of arr){
             b.steerLeft -= dt;
             if (b.steerLeft <= 0){
@@ -365,8 +374,8 @@
             b.px += b.vx * speed * dt;
             b.py += b.vy * speed * dt;
 
-            const maxX = Math.max(0, w - b.size);
-            const maxY = Math.max(0, h - b.size);
+            const maxX = Math.max(0, BW - b.size);  // ✅ FIX
+            const maxY = Math.max(0, BH - b.size);  // ✅ FIX
 
             if (b.px <= 0){ b.px = 0; b.vx = Math.abs(b.vx); }
             if (b.px >= maxX){ b.px = maxX; b.vx = -Math.abs(b.vx); }
@@ -377,8 +386,8 @@
           }
         }
 
-        update(bubbles1, SPEED_1);
-        update(bubbles2, SPEED_2);
+        update(bubbles1, SPEED_1, b1.w, b1.h);  // ✅ FIX
+        update(bubbles2, SPEED_2, b2.w, b2.h);  // ✅ FIX
 
         requestAnimationFrame(tick);
       }
@@ -388,4 +397,3 @@
   </script>
 </body>
 </html>
-
