@@ -54,7 +54,7 @@
       pointer-events:none;
     }
 
-    /* ✅ Canvas visible (sin soft-light que lo “apaga” en fondos claros) */
+    /* ✅ Canvas visible */
     #bubblesCanvas{
       position:fixed;
       inset:0;
@@ -62,8 +62,8 @@
       pointer-events:none;
 
       display:block;
-      opacity:0.90;              /* ✅ más visible */
-      mix-blend-mode: normal;     /* ✅ clave: evita que desaparezcan */
+      opacity:0.90;
+      mix-blend-mode: normal;
       filter: saturate(1.10) contrast(1.10);
     }
 
@@ -94,7 +94,6 @@
       100%{ transform:translateX(45%) rotate(6deg); }
     }
 
-    /* ✅ portada: SOLO la imagen Sobre.png */
     .cover{
       width: min(720px, 92vw);
       max-height: 86svh;
@@ -129,7 +128,7 @@
       position: relative;
       display: grid;
       place-items: center;
-      z-index:10; /* ✅ arriba del canvas */
+      z-index:10;
     }
 
     .hint{
@@ -199,9 +198,6 @@
       }
     });
 
-    /* =========================================================
-       ✅ Burbujas en Canvas (visible y rebote estable)
-       ========================================================= */
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (!reduceMotion) {
@@ -235,7 +231,6 @@
 
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        // clamp para que no queden fuera
         for (const b of bubbles){
           b.x = Math.min(b.x, Math.max(0, vp.w - b.size));
           b.y = Math.min(b.y, Math.max(0, vp.h - b.size));
@@ -247,10 +242,11 @@
         const r = Math.random();
         const kind = (r < 0.34) ? "gold" : (r < 0.67) ? "cream" : "white";
 
-        // ✅ alphas más altos para que se vean
-        let alpha = (kind === "gold") ? rand(0.45, 0.85)
-                  : (kind === "cream") ? rand(0.35, 0.70)
-                  : rand(0.28, 0.60);
+        /* ✅ CAMBIO: GOLD mucho más sutil */
+        let alpha;
+        if (kind === "gold") alpha = rand(0.18, 0.38);   // ✅ antes estaba alta
+        else if (kind === "cream") alpha = rand(0.35, 0.70);
+        else alpha = rand(0.28, 0.60);
 
         const angle = rand(0, Math.PI * 2);
         const speed = rand(10, 26);
@@ -270,7 +266,6 @@
       }
 
       resizeCanvas();
-
       for (let i=0; i<COUNT; i++) bubbles.push(makeBubble());
 
       function drawBubble(b){
@@ -284,10 +279,11 @@
         const g = ctx.createRadialGradient(hx, hy, r * 0.10, x, y, r);
 
         if (b.kind === "gold"){
-          g.addColorStop(0.00, `rgba(255,255,255,${0.65 * b.alpha})`);
-          g.addColorStop(0.30, `rgba(241,209,138,${0.75 * b.alpha})`);
-          g.addColorStop(0.62, `rgba(201,151,43,${0.80 * b.alpha})`);
-          g.addColorStop(0.82, `rgba(160,115,25,${0.35 * b.alpha})`);
+          /* ✅ CAMBIO: gold menos “sólida”, más clara y menos saturada */
+          g.addColorStop(0.00, `rgba(255,255,255,${0.55 * b.alpha})`);
+          g.addColorStop(0.32, `rgba(241,209,138,${0.45 * b.alpha})`);
+          g.addColorStop(0.62, `rgba(201,151,43,${0.38 * b.alpha})`);
+          g.addColorStop(0.82, `rgba(201,151,43,${0.14 * b.alpha})`);
           g.addColorStop(1.00, `rgba(255,255,255,0)`);
         } else if (b.kind === "cream"){
           g.addColorStop(0.00, `rgba(255,255,255,${0.55 * b.alpha})`);
@@ -304,14 +300,12 @@
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
 
-        // borde sutil
         ctx.strokeStyle = `rgba(255,255,255,${0.18 * b.alpha})`;
         ctx.lineWidth = 1;
         ctx.stroke();
       }
 
       function onResizeLike(){ resizeCanvas(); }
-
       window.addEventListener("resize", onResizeLike, { passive:true });
       window.addEventListener("orientationchange", onResizeLike, { passive:true });
       if (window.visualViewport){
