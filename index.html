@@ -14,7 +14,6 @@
 }
 
     *{ box-sizing:border-box; }
-
     img{ max-width:100%; height:auto; }
 
     html, body{
@@ -55,15 +54,17 @@
       pointer-events:none;
     }
 
-    /* ✅ NUEVO: Canvas de burbujas (full viewport real) */
+    /* ✅ Canvas visible (sin soft-light que lo “apaga” en fondos claros) */
     #bubblesCanvas{
       position:fixed;
       inset:0;
       z-index:1;
       pointer-events:none;
-      /* look “soft” similar a tus layers */
-      mix-blend-mode: soft-light;
-      filter: saturate(1.05) contrast(1.06);
+
+      display:block;
+      opacity:0.90;              /* ✅ más visible */
+      mix-blend-mode: normal;     /* ✅ clave: evita que desaparezcan */
+      filter: saturate(1.10) contrast(1.10);
     }
 
     .shimmer{
@@ -169,13 +170,9 @@
 
 <body>
   <div class="bg-base"></div>
-
-  <!-- ✅ NUEVO: burbujas en canvas -->
   <canvas id="bubblesCanvas"></canvas>
-
   <div class="shimmer"></div>
 
-  <!-- ✅ SOLO IMAGEN. Click = música -->
   <div class="cover-wrap">
     <img src="assets/Sobre.png" alt="Sobre" class="cover" id="cover" />
     <div class="hint" id="hint">Toca el sobre para abrir</div>
@@ -195,7 +192,6 @@
       try {
         const hint = document.getElementById("hint");
         if (hint) hint.style.display = "none";
-
         if (!music.paused) return;
         await music.play();
       } catch (e) {
@@ -204,7 +200,7 @@
     });
 
     /* =========================================================
-       ✅ Burbujas en Canvas: rebote 100% estable (sin “mitad”)
+       ✅ Burbujas en Canvas (visible y rebote estable)
        ========================================================= */
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -214,7 +210,6 @@
 
       function rand(min, max){ return Math.random() * (max - min) + min; }
 
-      // Dimensiones reales del viewport (robusto en WebViews)
       function getVP(){
         const vv = window.visualViewport;
         const w = Math.round(vv ? vv.width  : document.documentElement.clientWidth);
@@ -223,7 +218,10 @@
       }
 
       let vp = getVP();
-      let dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1)); // cap para rendimiento
+      let dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+
+      const bubbles = [];
+      const COUNT = 18;
 
       function resizeCanvas(){
         vp = getVP();
@@ -235,35 +233,27 @@
         canvas.width = Math.floor(vp.w * dpr);
         canvas.height = Math.floor(vp.h * dpr);
 
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // dibujar en CSS px
-      }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      resizeCanvas();
-      window.addEventListener("resize", resizeCanvas, { passive:true });
-      window.addEventListener("orientationchange", resizeCanvas, { passive:true });
-      if (window.visualViewport){
-        window.visualViewport.addEventListener("resize", resizeCanvas, { passive:true });
-        window.visualViewport.addEventListener("scroll", resizeCanvas, { passive:true });
+        // clamp para que no queden fuera
+        for (const b of bubbles){
+          b.x = Math.min(b.x, Math.max(0, vp.w - b.size));
+          b.y = Math.min(b.y, Math.max(0, vp.h - b.size));
+        }
       }
-
-      // Configuración de burbujas (simula tus 2 layers)
-      const bubbles = [];
-      const COUNT = 18;
 
       function makeBubble(){
-        // tamaños similares a los tuyos
         const size = rand(60, 200);
-
-        // tipo: gold / cream / white
         const r = Math.random();
         const kind = (r < 0.34) ? "gold" : (r < 0.67) ? "cream" : "white";
 
-        // opacidades parecidas a tu setup
-        let alpha = (kind === "gold") ? rand(0.24, 0.55) : (kind === "cream") ? rand(0.18, 0.42) : rand(0.14, 0.36);
+        // ✅ alphas más altos para que se vean
+        let alpha = (kind === "gold") ? rand(0.45, 0.85)
+                  : (kind === "cream") ? rand(0.35, 0.70)
+                  : rand(0.28, 0.60);
 
-        // velocidad
         const angle = rand(0, Math.PI * 2);
-        const speed = rand(10, 26); // px/s base (luego metemos steering)
+        const speed = rand(10, 26);
         const vx = Math.cos(angle) * speed;
         const vy = Math.sin(angle) * speed;
 
@@ -279,87 +269,75 @@
         };
       }
 
+      resizeCanvas();
+
       for (let i=0; i<COUNT; i++) bubbles.push(makeBubble());
-
-      function clampToNewViewport(){
-        for (const b of bubbles){
-          b.x = Math.min(b.x, Math.max(0, vp.w - b.size));
-          b.y = Math.min(b.y, Math.max(0, vp.h - b.size));
-        }
-      }
-
-      // si cambia tamaño, clamp
-      const oldResize = resizeCanvas;
-      function resizeCanvasAndClamp(){
-        oldResize();
-        clampToNewViewport();
-      }
-      // reemplazar listeners con clamp (sin duplicar)
-      window.removeEventListener("resize", resizeCanvas);
-      window.addEventListener("resize", resizeCanvasAndClamp, { passive:true });
-
-      let last = performance.now();
 
       function drawBubble(b){
         const x = b.x + b.size * 0.5;
         const y = b.y + b.size * 0.5;
         const r = b.size * 0.5;
 
-        // gradiente con highlight tipo “burbuja”
         const hx = x - r * 0.22;
         const hy = y - r * 0.22;
 
         const g = ctx.createRadialGradient(hx, hy, r * 0.10, x, y, r);
 
         if (b.kind === "gold"){
-          g.addColorStop(0.00, `rgba(255,255,255,${0.42 * b.alpha})`);
-          g.addColorStop(0.30, `rgba(241,209,138,${0.55 * b.alpha})`);
-          g.addColorStop(0.62, `rgba(201,151,43,${0.58 * b.alpha})`);
-          g.addColorStop(0.80, `rgba(160,115,25,${0.22 * b.alpha})`);
+          g.addColorStop(0.00, `rgba(255,255,255,${0.65 * b.alpha})`);
+          g.addColorStop(0.30, `rgba(241,209,138,${0.75 * b.alpha})`);
+          g.addColorStop(0.62, `rgba(201,151,43,${0.80 * b.alpha})`);
+          g.addColorStop(0.82, `rgba(160,115,25,${0.35 * b.alpha})`);
           g.addColorStop(1.00, `rgba(255,255,255,0)`);
         } else if (b.kind === "cream"){
-          g.addColorStop(0.00, `rgba(255,255,255,${0.35 * b.alpha})`);
-          g.addColorStop(0.60, `rgba(255,248,235,${0.65 * b.alpha})`);
+          g.addColorStop(0.00, `rgba(255,255,255,${0.55 * b.alpha})`);
+          g.addColorStop(0.60, `rgba(255,248,235,${0.85 * b.alpha})`);
           g.addColorStop(1.00, `rgba(255,255,255,0)`);
         } else {
-          g.addColorStop(0.00, `rgba(255,255,255,${0.28 * b.alpha})`);
-          g.addColorStop(0.62, `rgba(255,255,255,${0.22 * b.alpha})`);
+          g.addColorStop(0.00, `rgba(255,255,255,${0.50 * b.alpha})`);
+          g.addColorStop(0.65, `rgba(255,255,255,${0.35 * b.alpha})`);
           g.addColorStop(1.00, `rgba(255,255,255,0)`);
         }
 
-        // “rim” y sombra suave (similar a tu box-shadow)
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
 
         // borde sutil
-        ctx.strokeStyle = `rgba(255,255,255,${0.12 * b.alpha})`;
+        ctx.strokeStyle = `rgba(255,255,255,${0.18 * b.alpha})`;
         ctx.lineWidth = 1;
         ctx.stroke();
       }
+
+      function onResizeLike(){ resizeCanvas(); }
+
+      window.addEventListener("resize", onResizeLike, { passive:true });
+      window.addEventListener("orientationchange", onResizeLike, { passive:true });
+      if (window.visualViewport){
+        window.visualViewport.addEventListener("resize", onResizeLike, { passive:true });
+        window.visualViewport.addEventListener("scroll", onResizeLike, { passive:true });
+      }
+
+      let last = performance.now();
 
       function tick(now){
         const dt = Math.min(0.033, (now - last) / 1000);
         last = now;
 
-        // limpiar
         ctx.clearRect(0, 0, vp.w, vp.h);
 
-        // update + draw
         for (const b of bubbles){
-          // steering suave (como tu ax/ay)
           b.steerLeft -= dt;
           if (b.steerLeft <= 0){
             b.steerLeft = rand(0.6, 1.4);
-            b.ax = rand(-18, 18); // aceleración px/s²
+            b.ax = rand(-18, 18);
             b.ay = rand(-18, 18);
           }
 
           b.vx += b.ax * dt;
           b.vy += b.ay * dt;
 
-          // limitar velocidad
           const vmax = 32;
           const v = Math.hypot(b.vx, b.vy) || 1;
           if (v > vmax){
@@ -373,7 +351,6 @@
           const maxX = Math.max(0, vp.w - b.size);
           const maxY = Math.max(0, vp.h - b.size);
 
-          // ✅ rebote real contra bordes del viewport
           if (b.x <= 0){ b.x = 0; b.vx = Math.abs(b.vx); }
           if (b.x >= maxX){ b.x = maxX; b.vx = -Math.abs(b.vx); }
           if (b.y <= 0){ b.y = 0; b.vy = Math.abs(b.vy); }
