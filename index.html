@@ -11,6 +11,9 @@
   --bChamp: rgba(241,209,138,.32);
   --bCream: rgba(255,248,235,.34);
   --bWhite: rgba(255,255,255,.26);
+
+  /* ✅ easing cálido */
+  --easeWarm: cubic-bezier(.18,.86,.22,1);
 }
 
     *{ box-sizing:border-box; }
@@ -59,7 +62,6 @@
       display:block;
       opacity:0.92;
       mix-blend-mode: normal;
-
       filter: saturate(1.06) contrast(1.10);
     }
 
@@ -101,7 +103,7 @@
       -webkit-user-drag:none;
 
       filter: drop-shadow(0 18px 35px rgba(0,0,0,.16));
-      transition: transform .25s ease, filter .25s ease;
+      transition: transform .25s ease, filter .25s ease, opacity .25s ease;
     }
 
     @media (min-width: 900px){
@@ -121,7 +123,7 @@
     .hint{
       position: absolute;
       left: 50%;
-      bottom: 6%;
+      bottom: 10%;
       transform: translateX(-50%);
       width: 92%;
       max-width: 520px;
@@ -144,35 +146,27 @@
       to  { opacity:1; transform: translateX(-50%) translateY(0); }
     }
 
-    /* ✅ 1) AJUSTE MOVIL: el texto más cerca del sobre */
+    /* ✅ Móvil: más cerca del sobre */
     @media (max-width: 520px){
       .hint{
-        bottom: 14%;              /* antes 7% -> ahora más arriba */
+        bottom: 14%;
         font-size: .95rem;
         letter-spacing: 1.2px;
       }
     }
 
-    /* ===== Transición de apertura (más lenta y cálida) ===== */
+    /* ===== Transición faseada para que se NOTE ===== */
 
-    /* ✅ easing más “suave/cálido” */
-    :root{
-      --easeWarm: cubic-bezier(.18,.86,.22,1);
-    }
-
-    /* El abierto va encima pero invisible */
+    /* ✅ Abierto oculto de verdad */
     .cover-open{
       position:absolute;
       opacity:0;
-      transform: translateY(18px) scale(0.985);
-      filter: drop-shadow(0 18px 35px rgba(0,0,0,.16)) blur(0px);
+      visibility:hidden;
+      transform: translateY(10px) scale(0.99);
       pointer-events:none;
-
-      /* ✅ 2) transición más lenta */
       transition:
-        opacity 1.05s var(--easeWarm),
-        transform 1.05s var(--easeWarm),
-        filter 1.05s var(--easeWarm);
+        opacity 1.10s var(--easeWarm),
+        transform 1.10s var(--easeWarm);
     }
 
     /* Feedback táctil */
@@ -181,37 +175,31 @@
       filter: drop-shadow(0 12px 26px rgba(0,0,0,.14));
     }
 
-    /* Cuando abrimos: el cerrado se va (lento) */
+    /* ✅ Closed fade-out: sin blur fuerte para que se perciba */
     .cover.is-fadeout{
       opacity:0;
-      transform: translateY(-16px) scale(1.02);
-      filter: drop-shadow(0 24px 45px rgba(0,0,0,.10)) blur(10px);
-
-      /* ✅ transición más lenta también */
+      transform: translateY(-6px) scale(0.995);
+      filter: drop-shadow(0 18px 35px rgba(0,0,0,.12));
       transition:
-        opacity 1.15s var(--easeWarm),
-        transform 1.15s var(--easeWarm),
-        filter 1.15s var(--easeWarm);
+        opacity 1.30s var(--easeWarm),
+        transform 1.30s var(--easeWarm),
+        filter 1.30s var(--easeWarm);
     }
 
-    /* El abierto entra (lento + suave) */
+    /* ✅ Open entra después */
     .cover-open.is-show{
       opacity:1;
-      transform: translateY(0px) scale(1);
-      filter: drop-shadow(0 22px 45px rgba(0,0,0,.18)) blur(0px);
+      visibility:visible;
+      transform: translateY(0) scale(1);
     }
 
-    /* ✅ 2) IMPORTANTE: NO desaparece rápido.
-       Solo se desvanece si agregamos is-reveal.
-       Así que lo controlamos por tiempo en JS. */
+    /* ✅ Open se va (opcional) */
     .cover-open.is-reveal{
       opacity:0;
-      transform: translateY(-14px) scale(1.02);
-      filter: drop-shadow(0 24px 45px rgba(0,0,0,.10)) blur(12px);
+      transform: translateY(-10px) scale(1.01);
       transition:
-        opacity 1.05s var(--easeWarm),
-        transform 1.05s var(--easeWarm),
-        filter 1.05s var(--easeWarm);
+        opacity 1.10s var(--easeWarm),
+        transform 1.10s var(--easeWarm);
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -255,39 +243,51 @@
 
       if (hint) hint.style.display = "none";
 
-      // ✅ 2) Timing más cálido (más lento)
-      const PRESS_MS = 150;        // feedback
-      const START_TRANSITION_MS = 220; // espera para que se sienta el click
-      const OPEN_VISIBLE_MS = 2200; // ✅ tiempo visible del sobre abierto (antes 900)
+      /* ✅ Timing por fases (para que se note) */
+      const PRESS_MS = 150;
+
+      // Fase A: cerrar se desvanece (visible)
+      const CLOSED_FADE_MS = 1400;
+
+      // Fase B: abierto aparece (visible)
+      const OPEN_FADE_MS = 1200;
+
+      // Tiempo visible del abierto (calidez)
+      const OPEN_HOLD_MS = 2500;
 
       // 1) feedback táctil
       coverClosed.classList.add("is-press");
       setTimeout(() => coverClosed.classList.remove("is-press"), PRESS_MS);
 
-      // 2) música (intento)
-      try {
-        if (music.paused) await music.play();
-      } catch (e) {
-        console.error("No se pudo reproducir. Verifica el archivo en /assets.", e);
+      // 2) música (intento, sin bloquear animación si falla)
+      if (music.paused) {
+        music.play().catch(e => console.error("No se pudo reproducir audio:", e));
       }
 
-      // 3) transición lenta: cerrado fade out, abierto fade in
+      // 3) empieza fade-out del cerrado
+      const T0 = 120;
       setTimeout(() => {
         coverClosed.classList.add("is-fadeout");
-        coverOpen.classList.add("is-show");
-      }, START_TRANSITION_MS);
+      }, T0);
 
-      // 4) después de mostrar el abierto un buen tiempo, revelamos fondo
+      // 4) cuando ya casi se fue el cerrado, entra el abierto
+      setTimeout(() => {
+        coverOpen.classList.add("is-show");
+      }, T0 + CLOSED_FADE_MS);
+
+      // 5) después de verse un buen rato, revelar fondo (opcional)
       setTimeout(() => {
         coverOpen.classList.add("is-reveal");
-      }, START_TRANSITION_MS + OPEN_VISIBLE_MS);
+      }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS);
 
-      // 5) ocultar al final (cuando ya terminó el reveal)
+      // 6) ocultar al final
       setTimeout(() => {
         coverClosed.style.display = "none";
         coverOpen.style.display = "none";
-      }, START_TRANSITION_MS + OPEN_VISIBLE_MS + 1200);
+      }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + 1200);
     });
+
+    /* ===== Tu código de burbujas (sin cambios) ===== */
 
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
