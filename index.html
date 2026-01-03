@@ -215,12 +215,10 @@
       animation: none;
     }
 
-    /* Entrada igual que hint */
     .welcome.is-animate{
       animation: hintIn .7s ease forwards;
     }
 
-    /* ✅ Salida (primero se va el texto) */
     @keyframes welcomeOut{
       from{ opacity:1; transform: translateX(-50%) translateY(0); }
       to  { opacity:0; transform: translateX(-50%) translateY(-6px); }
@@ -237,8 +235,127 @@
       }
     }
 
+    /* =========================
+       ✅ SUN / LENS TRANSITION
+       ========================= */
+
+    #sunTransition{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      background: #fff; /* blanco final */
+      mix-blend-mode: normal;
+    }
+
+    #sunTransition::before{
+      content:"";
+      position:absolute;
+      left: 0;
+      top: 0;
+
+      width: 18vmax;
+      height: 18vmax;
+
+      transform: translate(-35%, -35%) scale(0.10);
+      transform-origin: 0 0;
+      border-radius: 50%;
+
+      background: radial-gradient(circle at 35% 35%,
+        rgba(255,255,255,0.95) 0%,
+        rgba(255,248,235,0.92) 18%,
+        rgba(241,209,138,0.85) 34%,
+        rgba(201,151,43,0.35) 55%,
+        rgba(255,255,255,0.00) 72%
+      );
+
+      filter: blur(0px);
+      opacity: 0;
+    }
+
+    #sunTransition::after{
+      content:"";
+      position:absolute;
+      inset:-30%;
+      background: linear-gradient(115deg,
+        rgba(255,255,255,0) 0%,
+        rgba(241,209,138,0.45) 42%,
+        rgba(255,255,255,0.95) 50%,
+        rgba(241,209,138,0.35) 58%,
+        rgba(255,255,255,0) 100%
+      );
+      opacity: 0;
+      filter: blur(16px);
+      transform: translateX(-40%) rotate(6deg);
+    }
+
+    body.is-sun-transition #sunTransition{
+      opacity: 1;
+    }
+    body.is-sun-transition #sunTransition::before{
+      animation: sunGrow var(--sunDur, 1400ms) var(--easeWarm) forwards;
+    }
+    body.is-sun-transition #sunTransition::after{
+      animation: sunStreak var(--sunDur, 1400ms) var(--easeWarm) forwards;
+    }
+
+    body.is-sun-transition #bubblesCanvas{
+      animation: blurBubbles var(--sunDur, 1400ms) var(--easeWarm) forwards;
+    }
+    body.is-sun-transition .shimmer{
+      animation: blurShimmer var(--sunDur, 1400ms) var(--easeWarm) forwards;
+    }
+    body.is-sun-transition #coverWrap{
+      animation: blurContent var(--sunDur, 1400ms) var(--easeWarm) forwards;
+    }
+
+    @keyframes sunGrow{
+      0%{
+        opacity: 0;
+        transform: translate(-35%, -35%) scale(0.10);
+        filter: blur(0px);
+      }
+      25%{
+        opacity: 1;
+        transform: translate(-35%, -35%) scale(0.75);
+        filter: blur(6px);
+      }
+      65%{
+        opacity: 1;
+        transform: translate(-35%, -35%) scale(2.2);
+        filter: blur(18px);
+      }
+      100%{
+        opacity: 1;
+        transform: translate(-35%, -35%) scale(4.2);
+        filter: blur(26px);
+      }
+    }
+
+    @keyframes sunStreak{
+      0%{ opacity: 0; transform: translateX(-45%) rotate(6deg); }
+      35%{ opacity: .45; transform: translateX(-15%) rotate(6deg); }
+      100%{ opacity: .95; transform: translateX(20%) rotate(6deg); }
+    }
+
+    @keyframes blurBubbles{
+      0%{ filter: saturate(1.06) contrast(1.10) blur(0px); opacity: .92; }
+      100%{ filter: saturate(1.02) contrast(1.05) blur(18px); opacity: .35; }
+    }
+    @keyframes blurShimmer{
+      0%{ filter: blur(10px); opacity: .50; }
+      100%{ filter: blur(28px); opacity: .15; }
+    }
+    @keyframes blurContent{
+      0%{ filter: blur(0px); opacity: 1; }
+      100%{ filter: blur(14px); opacity: 0.15; }
+    }
+
     @media (prefers-reduced-motion: reduce){
-      .cover, .cover-open, .welcome{
+      .cover, .cover-open, .welcome,
+      #sunTransition, #sunTransition::before, #sunTransition::after,
+      #bubblesCanvas, .shimmer, #coverWrap{
         transition:none !important;
         animation:none !important;
         filter:none !important;
@@ -257,9 +374,11 @@
     <img src="assets/Sobre-Cerrado.png" alt="Sobre cerrado" class="cover" id="coverClosed" />
     <img src="assets/Sobre.png" alt="Sobre abierto" class="cover cover-open" id="coverOpen" />
     <div class="hint" id="hint">Toca el sobre para abrir</div>
-
     <div class="welcome" id="welcome">Bienvenidos a nuestra Historia</div>
   </div>
+
+  <!-- ✅ Overlay “Sol / Lente” -->
+  <div id="sunTransition" aria-hidden="true"></div>
 
   <audio id="bg-music" preload="auto">
     <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
@@ -275,6 +394,26 @@
 
     let opened = false;
 
+    function runSunTransition({ duration = 1400 } = {}) {
+      document.documentElement.style.setProperty("--sunDur", duration + "ms");
+      document.body.classList.add("is-sun-transition");
+
+      window.setTimeout(() => {
+        // ✅ Dejamos limpio para la siguiente pantalla/sección
+        const canvas = document.getElementById("bubblesCanvas");
+        const shimmer = document.querySelector(".shimmer");
+        if (canvas) canvas.style.display = "none";
+        if (shimmer) shimmer.style.display = "none";
+
+        // También puedes apagar el gradiente animado si quieres blanco total:
+        const bg = document.querySelector(".bg-base");
+        if (bg) bg.style.display = "none";
+
+        // AQUÍ: mostrar tu contenido (otra sección) sin parar música
+        // Ejemplo futuro: document.getElementById("contenido").classList.add("is-show");
+      }, duration);
+    }
+
     coverClosed.addEventListener("click", async () => {
       if (opened) return;
       opened = true;
@@ -286,12 +425,13 @@
       const OPEN_FADE_MS = 1200;
       const OPEN_HOLD_MS = 2500;
 
-      // ✅ Delay tipo "hint": imagen primero, texto después
-      const WELCOME_DELAY_AFTER_OPEN = 850; // ajusta 650–1100 a gusto
+      const WELCOME_DELAY_AFTER_OPEN = 850;
 
-      // ✅ NUEVO: primero se va el texto, luego el sobre abierto
-      const WELCOME_OUT_MS = 850;   // duración del texto al irse (match con CSS .85s)
-      const GAP_BEFORE_REVEAL = 180; // pequeño respiro antes de irse el sobre
+      const WELCOME_OUT_MS = 850;     // match con .welcome.is-out (.85s)
+      const GAP_BEFORE_REVEAL = 180;  // respiro antes del sobre
+
+      // ✅ Sol/lente duration (ajústalo)
+      const SUN_MS = 1500;
 
       coverClosed.classList.add("is-press");
       setTimeout(() => coverClosed.classList.remove("is-press"), PRESS_MS);
@@ -310,27 +450,33 @@
         coverOpen.classList.add("is-show");
       }, T0 + CLOSED_FADE_MS);
 
-      // ✅ Texto aparece DESPUÉS, igual que "hint"
       setTimeout(() => {
         if (welcome) welcome.classList.add("is-animate");
       }, T0 + CLOSED_FADE_MS + WELCOME_DELAY_AFTER_OPEN);
 
-      // ✅ 1) Primero: se va el texto
+      // 1) se va el texto
       setTimeout(() => {
         if (welcome) welcome.classList.add("is-out");
       }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS);
 
-      // ✅ 2) Después: se va el sobre abierto
+      // 2) se va el sobre abierto
+      const REVEAL_AT = T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + WELCOME_OUT_MS + GAP_BEFORE_REVEAL;
       setTimeout(() => {
         coverOpen.classList.add("is-reveal");
-      }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + WELCOME_OUT_MS + GAP_BEFORE_REVEAL);
+      }, REVEAL_AT);
 
-      // ocultar al final
+      // 3) cuando el sobre ya empezó a irse, disparamos el sol (para transición a blanco)
+      //    (puedes mover este delay +/- 150ms si quieres que empiece antes/después)
+      setTimeout(() => {
+        runSunTransition({ duration: SUN_MS });
+      }, REVEAL_AT + 220);
+
+      // ocultar portada al final (ya sin estorbar)
       setTimeout(() => {
         coverClosed.style.display = "none";
         coverOpen.style.display = "none";
         if (welcome) welcome.style.display = "none";
-      }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + WELCOME_OUT_MS + GAP_BEFORE_REVEAL + 1200);
+      }, REVEAL_AT + 1400);
     });
 
     /* ===== Burbujas (sin cambios) ===== */
