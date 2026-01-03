@@ -202,8 +202,59 @@
         transform 1.10s var(--easeWarm);
     }
 
+    /* ===== ✅ TEXTO: "Bienvenidos a nuestra Historia" ===== */
+    .welcome{
+      position:absolute;
+      left:50%;
+      bottom: 6.8%;                 /* ✅ cerca del sobre abierto */
+      transform: translateX(-50%);
+      width: 92%;
+      max-width: 560px;
+
+      font-family: "Georgia", "Times New Roman", serif; /* ✅ serif elegante */
+      font-size: 1.15rem;
+      letter-spacing: 0.9px;
+      text-transform: none;
+
+      color: rgba(166, 128, 56, .78); /* dorado suave */
+      text-shadow: 0 1px 0 rgba(255,255,255,.35);
+
+      opacity: 0;
+      visibility: hidden;
+      pointer-events:none;
+      user-select:none;
+
+      transition:
+        opacity 1.30s var(--easeWarm),
+        transform 1.30s var(--easeWarm);
+    }
+
+    /* Aparece cuando el sobre abierto ya está visible */
+    .welcome.is-show{
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Si revelas fondo, se va junto con el sobre abierto */
+    .welcome.is-reveal{
+      opacity: 0;
+      transform: translateX(-50%) translateY(-8px);
+      transition:
+        opacity 1.10s var(--easeWarm),
+        transform 1.10s var(--easeWarm);
+    }
+
+    @media (max-width: 520px){
+      .welcome{
+        bottom: 10.5%;
+        font-size: 1.00rem;
+        letter-spacing: 0.7px;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce){
-      .cover, .cover-open{
+      .cover, .cover-open, .welcome{
         transition:none !important;
         animation:none !important;
         filter:none !important;
@@ -222,6 +273,9 @@
     <img src="assets/Sobre-Cerrado.png" alt="Sobre cerrado" class="cover" id="coverClosed" />
     <img src="assets/Sobre.png" alt="Sobre abierto" class="cover cover-open" id="coverOpen" />
     <div class="hint" id="hint">Toca el sobre para abrir</div>
+
+    <!-- ✅ NUEVO: texto elegante (sale con el sobre abierto) -->
+    <div class="welcome" id="welcome">Bienvenidos a nuestra Historia</div>
   </div>
 
   <audio id="bg-music" preload="auto">
@@ -234,6 +288,7 @@
     const coverOpen   = document.getElementById("coverOpen");
     const music = document.getElementById("bg-music");
     const hint  = document.getElementById("hint");
+    const welcome = document.getElementById("welcome");
 
     let opened = false;
 
@@ -275,15 +330,22 @@
         coverOpen.classList.add("is-show");
       }, T0 + CLOSED_FADE_MS);
 
+      // 4.1) ✅ aparece el texto ligeramente después (cálido)
+      setTimeout(() => {
+        if (welcome) welcome.classList.add("is-show");
+      }, T0 + CLOSED_FADE_MS + 260);
+
       // 5) después de verse un buen rato, revelar fondo (opcional)
       setTimeout(() => {
         coverOpen.classList.add("is-reveal");
+        if (welcome) welcome.classList.add("is-reveal");
       }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS);
 
       // 6) ocultar al final
       setTimeout(() => {
         coverClosed.style.display = "none";
         coverOpen.style.display = "none";
+        if (welcome) welcome.style.display = "none";
       }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + 1200);
     });
 
@@ -472,4 +534,3 @@
   </script>
 </body>
 </html>
-
