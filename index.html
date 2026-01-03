@@ -60,7 +60,6 @@
       opacity:0.92;
       mix-blend-mode: normal;
 
-      /* ✅ un poco menos saturado para que el gold no “grite” */
       filter: saturate(1.06) contrast(1.10);
     }
 
@@ -145,23 +144,35 @@
       to  { opacity:1; transform: translateX(-50%) translateY(0); }
     }
 
+    /* ✅ 1) AJUSTE MOVIL: el texto más cerca del sobre */
     @media (max-width: 520px){
-      .hint{ bottom: 7%; font-size: .95rem; letter-spacing: 1.2px; }
+      .hint{
+        bottom: 14%;              /* antes 7% -> ahora más arriba */
+        font-size: .95rem;
+        letter-spacing: 1.2px;
+      }
     }
 
-    /* ===== Transición de apertura (mínimo, estable en móvil) ===== */
+    /* ===== Transición de apertura (más lenta y cálida) ===== */
+
+    /* ✅ easing más “suave/cálido” */
+    :root{
+      --easeWarm: cubic-bezier(.18,.86,.22,1);
+    }
 
     /* El abierto va encima pero invisible */
     .cover-open{
       position:absolute;
       opacity:0;
-      transform: translateY(10px) scale(0.985);
+      transform: translateY(18px) scale(0.985);
       filter: drop-shadow(0 18px 35px rgba(0,0,0,.16)) blur(0px);
       pointer-events:none;
+
+      /* ✅ 2) transición más lenta */
       transition:
-        opacity .62s cubic-bezier(.2,.8,.2,1),
-        transform .62s cubic-bezier(.2,.8,.2,1),
-        filter .62s cubic-bezier(.2,.8,.2,1);
+        opacity 1.05s var(--easeWarm),
+        transform 1.05s var(--easeWarm),
+        filter 1.05s var(--easeWarm);
     }
 
     /* Feedback táctil */
@@ -170,32 +181,39 @@
       filter: drop-shadow(0 12px 26px rgba(0,0,0,.14));
     }
 
-    /* Cuando abrimos: el cerrado se va */
+    /* Cuando abrimos: el cerrado se va (lento) */
     .cover.is-fadeout{
       opacity:0;
-      transform: translateY(-10px) scale(1.02);
-      filter: drop-shadow(0 24px 45px rgba(0,0,0,.10)) blur(8px);
+      transform: translateY(-16px) scale(1.02);
+      filter: drop-shadow(0 24px 45px rgba(0,0,0,.10)) blur(10px);
+
+      /* ✅ transición más lenta también */
       transition:
-        opacity .62s cubic-bezier(.2,.8,.2,1),
-        transform .62s cubic-bezier(.2,.8,.2,1),
-        filter .62s cubic-bezier(.2,.8,.2,1);
+        opacity 1.15s var(--easeWarm),
+        transform 1.15s var(--easeWarm),
+        filter 1.15s var(--easeWarm);
     }
 
-    /* El abierto entra */
+    /* El abierto entra (lento + suave) */
     .cover-open.is-show{
       opacity:1;
       transform: translateY(0px) scale(1);
       filter: drop-shadow(0 22px 45px rgba(0,0,0,.18)) blur(0px);
     }
 
-    /* El abierto se desvanece para revelar el fondo */
+    /* ✅ 2) IMPORTANTE: NO desaparece rápido.
+       Solo se desvanece si agregamos is-reveal.
+       Así que lo controlamos por tiempo en JS. */
     .cover-open.is-reveal{
       opacity:0;
-      transform: translateY(-12px) scale(1.02);
-      filter: drop-shadow(0 24px 45px rgba(0,0,0,.10)) blur(10px);
+      transform: translateY(-14px) scale(1.02);
+      filter: drop-shadow(0 24px 45px rgba(0,0,0,.10)) blur(12px);
+      transition:
+        opacity 1.05s var(--easeWarm),
+        transform 1.05s var(--easeWarm),
+        filter 1.05s var(--easeWarm);
     }
 
-    /* Accesibilidad: reduce motion */
     @media (prefers-reduced-motion: reduce){
       .cover, .cover-open{
         transition:none !important;
@@ -213,12 +231,8 @@
   <div class="shimmer"></div>
 
   <div class="cover-wrap" id="coverWrap">
-    <!-- Estado cerrado (inicial) -->
     <img src="assets/Sobre-Cerrado.png" alt="Sobre cerrado" class="cover" id="coverClosed" />
-
-    <!-- Estado abierto (overlay) -->
     <img src="assets/Sobre.png" alt="Sobre abierto" class="cover cover-open" id="coverOpen" />
-
     <div class="hint" id="hint">Toca el sobre para abrir</div>
   </div>
 
@@ -239,54 +253,40 @@
       if (opened) return;
       opened = true;
 
+      if (hint) hint.style.display = "none";
+
+      // ✅ 2) Timing más cálido (más lento)
+      const PRESS_MS = 150;        // feedback
+      const START_TRANSITION_MS = 220; // espera para que se sienta el click
+      const OPEN_VISIBLE_MS = 2200; // ✅ tiempo visible del sobre abierto (antes 900)
+
+      // 1) feedback táctil
+      coverClosed.classList.add("is-press");
+      setTimeout(() => coverClosed.classList.remove("is-press"), PRESS_MS);
+
+      // 2) música (intento)
       try {
-        if (hint) hint.style.display = "none";
-
-        // 1) feedback táctil
-        coverClosed.classList.add("is-press");
-        setTimeout(() => coverClosed.classList.remove("is-press"), 140);
-
-        // 2) inicia música
-        if (music.paused) {
-          await music.play();
-        }
-
-        // 3) transición: cerrado se va, abierto entra
-        setTimeout(() => {
-          coverClosed.classList.add("is-fadeout");
-          coverOpen.classList.add("is-show");
-        }, 160);
-
-        // 4) dejar el abierto un momento y luego revelar el fondo
-        setTimeout(() => {
-          coverOpen.classList.add("is-reveal");
-        }, 160 + 900); // 900ms visible
-
-        // ocultar ambos al final
-        setTimeout(() => {
-          coverClosed.style.display = "none";
-          coverOpen.style.display = "none";
-        }, 160 + 900 + 650);
-
+        if (music.paused) await music.play();
       } catch (e) {
         console.error("No se pudo reproducir. Verifica el archivo en /assets.", e);
-
-        // Aunque no arranque audio, igual hacemos la transición visual
-        if (hint) hint.style.display = "none";
-        coverClosed.classList.add("is-press");
-        setTimeout(() => coverClosed.classList.remove("is-press"), 140);
-
-        setTimeout(() => {
-          coverClosed.classList.add("is-fadeout");
-          coverOpen.classList.add("is-show");
-        }, 160);
-
-        setTimeout(() => coverOpen.classList.add("is-reveal"), 160 + 900);
-        setTimeout(() => {
-          coverClosed.style.display = "none";
-          coverOpen.style.display = "none";
-        }, 160 + 900 + 650);
       }
+
+      // 3) transición lenta: cerrado fade out, abierto fade in
+      setTimeout(() => {
+        coverClosed.classList.add("is-fadeout");
+        coverOpen.classList.add("is-show");
+      }, START_TRANSITION_MS);
+
+      // 4) después de mostrar el abierto un buen tiempo, revelamos fondo
+      setTimeout(() => {
+        coverOpen.classList.add("is-reveal");
+      }, START_TRANSITION_MS + OPEN_VISIBLE_MS);
+
+      // 5) ocultar al final (cuando ya terminó el reveal)
+      setTimeout(() => {
+        coverClosed.style.display = "none";
+        coverOpen.style.display = "none";
+      }, START_TRANSITION_MS + OPEN_VISIBLE_MS + 1200);
     });
 
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -310,8 +310,7 @@
       const bubbles = [];
       const COUNT = 18;
 
-      // ✅ Ajustables rápido:
-      const GOLD_PROB = 0.22; // 0.22 = 22% gold (sube a 0.30 si quieres más)
+      const GOLD_PROB = 0.22;
       const GOLD_A_MIN = 0.24;
       const GOLD_A_MAX = 0.46;
 
@@ -339,7 +338,7 @@
         const kind = (r < GOLD_PROB) ? "gold" : (r < (GOLD_PROB + 0.39)) ? "cream" : "white";
 
         let alpha;
-        if (kind === "gold") alpha = rand(GOLD_A_MIN, GOLD_A_MAX);      // ✅ gold visible / distinguible
+        if (kind === "gold") alpha = rand(GOLD_A_MIN, GOLD_A_MAX);
         else if (kind === "cream") alpha = rand(0.34, 0.70);
         else alpha = rand(0.26, 0.60);
 
@@ -367,23 +366,20 @@
         const y = b.y + b.size * 0.5;
         const r = b.size * 0.5;
 
-        // highlight para “solidez”
         const hx = x - r * 0.24;
         const hy = y - r * 0.24;
 
         if (b.kind === "gold"){
-          // ✅ Base champagne (para que se vea "sólida" pero NO demasiado amarilla)
           ctx.fillStyle = `rgba(241,209,138,${0.22 * b.alpha})`;
           ctx.beginPath();
           ctx.arc(x, y, r, 0, Math.PI * 2);
           ctx.fill();
 
-          // ✅ Highlight blanco al centro (para distinguir)
           const g = ctx.createRadialGradient(hx, hy, r * 0.06, x, y, r);
-          g.addColorStop(0.00, `rgba(255,255,255,${0.85 * b.alpha})`);  // brillo blanco
+          g.addColorStop(0.00, `rgba(255,255,255,${0.85 * b.alpha})`);
           g.addColorStop(0.16, `rgba(255,255,255,${0.28 * b.alpha})`);
-          g.addColorStop(0.38, `rgba(241,209,138,${0.62 * b.alpha})`);  // champagne
-          g.addColorStop(0.70, `rgba(201,151,43,${0.32 * b.alpha})`);   // dorado suave
+          g.addColorStop(0.38, `rgba(241,209,138,${0.62 * b.alpha})`);
+          g.addColorStop(0.70, `rgba(201,151,43,${0.32 * b.alpha})`);
           g.addColorStop(0.86, `rgba(201,151,43,${0.14 * b.alpha})`);
           g.addColorStop(1.00, `rgba(255,255,255,0)`);
 
@@ -398,7 +394,6 @@
           return;
         }
 
-        // cream / white (igual que antes)
         const g = ctx.createRadialGradient(hx, hy, r * 0.10, x, y, r);
 
         if (b.kind === "cream"){
