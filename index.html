@@ -205,23 +205,29 @@
       font-size: 1.15rem;
       letter-spacing: 1.2px;
 
-      color: rgba(166, 128, 56, .78); /* dorado suave */
+      color: rgba(166, 128, 56, .78);
       text-shadow: 0 1px 0 rgba(255,255,255,.35);
 
-      opacity: 0;              /* ✅ igual que hint: inicia invisible */
+      opacity: 0;
       pointer-events:none;
       user-select:none;
 
-      /* ✅ NO animamos por default; lo activamos cuando toque */
-      animation: none;
+      animation: none; /* se activa cuando toque */
     }
 
-    /* ✅ cuando toque, usamos EXACTAMENTE la misma animación que hint */
     .welcome.is-animate{
       animation: hintIn .7s ease forwards;
     }
 
-    /* móvil */
+    /* ✅ NUEVO: salida sincronizada con el sobre abierto */
+    .welcome.is-hide{
+      opacity: 0;
+      transform: translateX(-50%) translateY(-6px);
+      transition:
+        opacity 1.10s var(--easeWarm),
+        transform 1.10s var(--easeWarm);
+    }
+
     @media (max-width: 520px){
       .welcome{
         bottom: 10.5%;
@@ -251,7 +257,6 @@
     <img src="assets/Sobre.png" alt="Sobre abierto" class="cover cover-open" id="coverOpen" />
     <div class="hint" id="hint">Toca el sobre para abrir</div>
 
-    <!-- ✅ NUEVO TEXTO -->
     <div class="welcome" id="welcome">Bienvenidos a nuestra Historia</div>
   </div>
 
@@ -305,11 +310,10 @@
         if (welcome) welcome.classList.add("is-animate");
       }, T0 + CLOSED_FADE_MS + WELCOME_DELAY_AFTER_OPEN);
 
-      // reveal opcional
+      // ✅ Reveal: el sobre abierto y el texto se van AL MISMO TIEMPO
       setTimeout(() => {
         coverOpen.classList.add("is-reveal");
-        // también escondemos el texto (simple)
-        if (welcome) welcome.style.opacity = "0";
+        if (welcome) welcome.classList.add("is-hide");
       }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS);
 
       setTimeout(() => {
