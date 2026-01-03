@@ -59,6 +59,7 @@
       opacity:0.92;
       mix-blend-mode: normal;
       filter: saturate(1.06) contrast(1.10);
+      will-change: filter, opacity;
     }
 
     .shimmer{
@@ -74,6 +75,7 @@
       filter: blur(10px);
       opacity:.5;
       animation: shimmerMove 7s ease-in-out infinite;
+      will-change: filter, opacity, transform;
     }
 
     @keyframes baseMove{
@@ -99,6 +101,7 @@
 
       filter: drop-shadow(0 18px 35px rgba(0,0,0,.16));
       transition: transform .25s ease, filter .25s ease, opacity .25s ease;
+      will-change: transform, opacity, filter;
     }
 
     @media (min-width: 900px){
@@ -113,6 +116,7 @@
       display: grid;
       place-items: center;
       z-index:10;
+      will-change: filter, opacity;
     }
 
     .hint{
@@ -149,7 +153,7 @@
       }
     }
 
-    /* ===== Transición ===== */
+    /* ===== Transición sobres ===== */
 
     .cover-open{
       position:absolute;
@@ -191,13 +195,12 @@
         transform 1.10s var(--easeWarm);
     }
 
-    /* ===== ✅ "Bienvenidos..." (solo entrada hintIn + salida propia) ===== */
+    /* ===== Texto Bienvenidos ===== */
     .welcome{
       position:absolute;
       left:50%;
       bottom: 6.8%;
       transform: translateX(-50%);
-
       width: 92%;
       max-width: 560px;
 
@@ -213,6 +216,7 @@
       user-select:none;
 
       animation: none;
+      will-change: opacity, transform;
     }
 
     .welcome.is-animate{
@@ -235,9 +239,9 @@
       }
     }
 
-    /* =========================
-       ✅ SUN / LENS TRANSITION
-       ========================= */
+    /* =========================================
+       ✅ TRANSICIÓN SOL / LENTE (SIN FLASH)
+       ========================================= */
 
     #sunTransition{
       position: fixed;
@@ -245,117 +249,152 @@
       z-index: 9999;
       pointer-events: none;
       opacity: 0;
-      background: #fff; /* blanco final */
-      mix-blend-mode: normal;
+      background: transparent;   /* ✅ CLAVE: no blanco al inicio */
     }
 
-    #sunTransition::before{
-      content:"";
+    /* capa blanca final */
+    #sunTransition .sun-white{
       position:absolute;
-      left: 0;
-      top: 0;
+      inset:0;
+      background:#fff;
+      opacity:0;                /* ✅ aparece al final */
+    }
 
-      width: 18vmax;
-      height: 18vmax;
-
-      transform: translate(-35%, -35%) scale(0.10);
-      transform-origin: 0 0;
+    /* círculo/lente */
+    #sunTransition .sun-circle{
+      position:absolute;
+      left:0;
+      top:0;
+      width: 22vmax;
+      height: 22vmax;
       border-radius: 50%;
+      transform: translate(-35%, -35%) scale(0.06);
+      transform-origin: 0 0;
+      opacity: 0;
 
       background: radial-gradient(circle at 35% 35%,
-        rgba(255,255,255,0.95) 0%,
-        rgba(255,248,235,0.92) 18%,
-        rgba(241,209,138,0.85) 34%,
-        rgba(201,151,43,0.35) 55%,
+        rgba(255,255,255,0.98) 0%,
+        rgba(255,248,235,0.92) 16%,
+        rgba(241,209,138,0.82) 34%,
+        rgba(201,151,43,0.30) 54%,
         rgba(255,255,255,0.00) 72%
       );
 
       filter: blur(0px);
-      opacity: 0;
+      will-change: transform, opacity, filter;
     }
 
-    #sunTransition::after{
-      content:"";
+    /* streak de lente (suave) */
+    #sunTransition .sun-streak{
       position:absolute;
       inset:-30%;
+      opacity:0;
+      filter: blur(18px);
+      transform: translateX(-45%) rotate(6deg);
+      will-change: transform, opacity;
+
       background: linear-gradient(115deg,
         rgba(255,255,255,0) 0%,
-        rgba(241,209,138,0.45) 42%,
-        rgba(255,255,255,0.95) 50%,
-        rgba(241,209,138,0.35) 58%,
+        rgba(241,209,138,0.18) 40%,
+        rgba(255,255,255,0.65) 50%,
+        rgba(241,209,138,0.14) 60%,
         rgba(255,255,255,0) 100%
       );
-      opacity: 0;
-      filter: blur(16px);
-      transform: translateX(-40%) rotate(6deg);
     }
 
+    /* activar transición */
     body.is-sun-transition #sunTransition{
       opacity: 1;
     }
-    body.is-sun-transition #sunTransition::before{
-      animation: sunGrow var(--sunDur, 1400ms) var(--easeWarm) forwards;
+
+    body.is-sun-transition #sunTransition .sun-circle{
+      animation: sunGrow var(--sunDur, 2400ms) var(--easeWarm) forwards;
     }
-    body.is-sun-transition #sunTransition::after{
-      animation: sunStreak var(--sunDur, 1400ms) var(--easeWarm) forwards;
+    body.is-sun-transition #sunTransition .sun-streak{
+      animation: sunStreak var(--sunDur, 2400ms) var(--easeWarm) forwards;
+    }
+    body.is-sun-transition #sunTransition .sun-white{
+      animation: sunWhite var(--sunDur, 2400ms) var(--easeWarm) forwards;
     }
 
+    /* ✅ Blur REAL de fondo (progresivo) */
     body.is-sun-transition #bubblesCanvas{
-      animation: blurBubbles var(--sunDur, 1400ms) var(--easeWarm) forwards;
+      animation: blurBubbles var(--sunDur, 2400ms) var(--easeWarm) forwards;
     }
     body.is-sun-transition .shimmer{
-      animation: blurShimmer var(--sunDur, 1400ms) var(--easeWarm) forwards;
+      animation: blurShimmer var(--sunDur, 2400ms) var(--easeWarm) forwards;
     }
     body.is-sun-transition #coverWrap{
-      animation: blurContent var(--sunDur, 1400ms) var(--easeWarm) forwards;
+      animation: blurContent var(--sunDur, 2400ms) var(--easeWarm) forwards;
+    }
+    body.is-sun-transition .bg-base{
+      animation: blurBase var(--sunDur, 2400ms) var(--easeWarm) forwards;
     }
 
+    /* círculo crece lento y se “abre” */
     @keyframes sunGrow{
       0%{
-        opacity: 0;
-        transform: translate(-35%, -35%) scale(0.10);
+        opacity: 1;
+        transform: translate(-35%, -35%) scale(0.06);
         filter: blur(0px);
       }
       25%{
         opacity: 1;
-        transform: translate(-35%, -35%) scale(0.75);
+        transform: translate(-35%, -35%) scale(0.60);
         filter: blur(6px);
       }
       65%{
         opacity: 1;
-        transform: translate(-35%, -35%) scale(2.2);
+        transform: translate(-35%, -35%) scale(2.0);
         filter: blur(18px);
       }
       100%{
         opacity: 1;
-        transform: translate(-35%, -35%) scale(4.2);
-        filter: blur(26px);
+        transform: translate(-35%, -35%) scale(4.4);
+        filter: blur(28px);
       }
     }
 
+    /* streak acompaña */
     @keyframes sunStreak{
-      0%{ opacity: 0; transform: translateX(-45%) rotate(6deg); }
-      35%{ opacity: .45; transform: translateX(-15%) rotate(6deg); }
-      100%{ opacity: .95; transform: translateX(20%) rotate(6deg); }
+      0%{ opacity: 0; transform: translateX(-48%) rotate(6deg); }
+      35%{ opacity: .25; transform: translateX(-20%) rotate(6deg); }
+      100%{ opacity: .55; transform: translateX(15%) rotate(6deg); }
     }
 
+    /* ✅ blanco SOLO al final (sin flash) */
+    @keyframes sunWhite{
+      0%{ opacity:0; }
+      70%{ opacity:0; }     /* aguanta transparente mientras se ve el círculo */
+      100%{ opacity:1; }    /* termina blanco total */
+    }
+
+    /* blurs progresivos (para que el ojo lo perciba) */
     @keyframes blurBubbles{
       0%{ filter: saturate(1.06) contrast(1.10) blur(0px); opacity: .92; }
-      100%{ filter: saturate(1.02) contrast(1.05) blur(18px); opacity: .35; }
+      45%{ filter: saturate(1.04) contrast(1.08) blur(10px); opacity: .70; }
+      100%{ filter: saturate(1.02) contrast(1.05) blur(22px); opacity: .25; }
     }
     @keyframes blurShimmer{
       0%{ filter: blur(10px); opacity: .50; }
-      100%{ filter: blur(28px); opacity: .15; }
+      50%{ filter: blur(22px); opacity: .25; }
+      100%{ filter: blur(34px); opacity: .10; }
     }
     @keyframes blurContent{
       0%{ filter: blur(0px); opacity: 1; }
-      100%{ filter: blur(14px); opacity: 0.15; }
+      55%{ filter: blur(10px); opacity: .55; }
+      100%{ filter: blur(18px); opacity: .15; }
+    }
+    @keyframes blurBase{
+      0%{ filter: blur(0px); opacity: 1; }
+      60%{ filter: blur(10px); opacity: .70; }
+      100%{ filter: blur(18px); opacity: .25; }
     }
 
     @media (prefers-reduced-motion: reduce){
       .cover, .cover-open, .welcome,
-      #sunTransition, #sunTransition::before, #sunTransition::after,
-      #bubblesCanvas, .shimmer, #coverWrap{
+      #sunTransition, #sunTransition * ,
+      #bubblesCanvas, .shimmer, #coverWrap, .bg-base{
         transition:none !important;
         animation:none !important;
         filter:none !important;
@@ -377,8 +416,12 @@
     <div class="welcome" id="welcome">Bienvenidos a nuestra Historia</div>
   </div>
 
-  <!-- ✅ Overlay “Sol / Lente” -->
-  <div id="sunTransition" aria-hidden="true"></div>
+  <!-- ✅ Sol / Lente -->
+  <div id="sunTransition" aria-hidden="true">
+    <div class="sun-white"></div>
+    <div class="sun-streak"></div>
+    <div class="sun-circle"></div>
+  </div>
 
   <audio id="bg-music" preload="auto">
     <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
@@ -394,23 +437,27 @@
 
     let opened = false;
 
-    function runSunTransition({ duration = 1400 } = {}) {
+    function runSunTransition({ duration = 2400 } = {}) {
       document.documentElement.style.setProperty("--sunDur", duration + "ms");
+      const sun = document.getElementById("sunTransition");
+      if (sun) sun.style.display = "block";
+
       document.body.classList.add("is-sun-transition");
 
+      // cuando termina el blanco final: ya limpiamos el fondo
       window.setTimeout(() => {
-        // ✅ Dejamos limpio para la siguiente pantalla/sección
         const canvas = document.getElementById("bubblesCanvas");
         const shimmer = document.querySelector(".shimmer");
+        const bg = document.querySelector(".bg-base");
+        const wrap = document.getElementById("coverWrap");
+
         if (canvas) canvas.style.display = "none";
         if (shimmer) shimmer.style.display = "none";
-
-        // También puedes apagar el gradiente animado si quieres blanco total:
-        const bg = document.querySelector(".bg-base");
         if (bg) bg.style.display = "none";
+        if (wrap) wrap.style.display = "none";
 
-        // AQUÍ: mostrar tu contenido (otra sección) sin parar música
-        // Ejemplo futuro: document.getElementById("contenido").classList.add("is-show");
+        // AQUÍ: mostrar tu contenido real (otra sección) SIN parar música
+        // ejemplo futuro: document.getElementById("contenido").style.display = "block";
       }, duration);
     }
 
@@ -427,11 +474,12 @@
 
       const WELCOME_DELAY_AFTER_OPEN = 850;
 
-      const WELCOME_OUT_MS = 850;     // match con .welcome.is-out (.85s)
-      const GAP_BEFORE_REVEAL = 180;  // respiro antes del sobre
+      // primero texto, luego sobre
+      const WELCOME_OUT_MS = 850;     // coincide con .85s
+      const GAP_BEFORE_REVEAL = 180;
 
-      // ✅ Sol/lente duration (ajústalo)
-      const SUN_MS = 1500;
+      // ✅ MÁS LENTO (ojo humano)
+      const SUN_MS = 2800;            // prueba 2600–3400
 
       coverClosed.classList.add("is-press");
       setTimeout(() => coverClosed.classList.remove("is-press"), PRESS_MS);
@@ -465,13 +513,12 @@
         coverOpen.classList.add("is-reveal");
       }, REVEAL_AT);
 
-      // 3) cuando el sobre ya empezó a irse, disparamos el sol (para transición a blanco)
-      //    (puedes mover este delay +/- 150ms si quieres que empiece antes/después)
+      // 3) inicia sol/lente cuando el sobre YA está yéndose (sin flash)
       setTimeout(() => {
         runSunTransition({ duration: SUN_MS });
-      }, REVEAL_AT + 220);
+      }, REVEAL_AT + 120);
 
-      // ocultar portada al final (ya sin estorbar)
+      // ocultar imágenes al final (ya no estorban)
       setTimeout(() => {
         coverClosed.style.display = "none";
         coverOpen.style.display = "none";
