@@ -148,6 +148,62 @@
     @media (max-width: 520px){
       .hint{ bottom: 7%; font-size: .95rem; letter-spacing: 1.2px; }
     }
+
+    /* ===== Transición de apertura (mínimo, estable en móvil) ===== */
+
+    /* El abierto va encima pero invisible */
+    .cover-open{
+      position:absolute;
+      opacity:0;
+      transform: translateY(10px) scale(0.985);
+      filter: drop-shadow(0 18px 35px rgba(0,0,0,.16)) blur(0px);
+      pointer-events:none;
+      transition:
+        opacity .62s cubic-bezier(.2,.8,.2,1),
+        transform .62s cubic-bezier(.2,.8,.2,1),
+        filter .62s cubic-bezier(.2,.8,.2,1);
+    }
+
+    /* Feedback táctil */
+    .cover.is-press{
+      transform: scale(0.985);
+      filter: drop-shadow(0 12px 26px rgba(0,0,0,.14));
+    }
+
+    /* Cuando abrimos: el cerrado se va */
+    .cover.is-fadeout{
+      opacity:0;
+      transform: translateY(-10px) scale(1.02);
+      filter: drop-shadow(0 24px 45px rgba(0,0,0,.10)) blur(8px);
+      transition:
+        opacity .62s cubic-bezier(.2,.8,.2,1),
+        transform .62s cubic-bezier(.2,.8,.2,1),
+        filter .62s cubic-bezier(.2,.8,.2,1);
+    }
+
+    /* El abierto entra */
+    .cover-open.is-show{
+      opacity:1;
+      transform: translateY(0px) scale(1);
+      filter: drop-shadow(0 22px 45px rgba(0,0,0,.18)) blur(0px);
+    }
+
+    /* El abierto se desvanece para revelar el fondo */
+    .cover-open.is-reveal{
+      opacity:0;
+      transform: translateY(-12px) scale(1.02);
+      filter: drop-shadow(0 24px 45px rgba(0,0,0,.10)) blur(10px);
+    }
+
+    /* Accesibilidad: reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      .cover, .cover-open{
+        transition:none !important;
+        animation:none !important;
+        filter:none !important;
+        transform:none !important;
+      }
+    }
   </style>
 </head>
 
@@ -156,8 +212,13 @@
   <canvas id="bubblesCanvas"></canvas>
   <div class="shimmer"></div>
 
-  <div class="cover-wrap">
-    <img src="assets/Sobre.png" alt="Sobre" class="cover" id="cover" />
+  <div class="cover-wrap" id="coverWrap">
+    <!-- Estado cerrado (inicial) -->
+    <img src="assets/Sobre-Cerrado.png" alt="Sobre cerrado" class="cover" id="coverClosed" />
+
+    <!-- Estado abierto (overlay) -->
+    <img src="assets/Sobre.png" alt="Sobre abierto" class="cover cover-open" id="coverOpen" />
+
     <div class="hint" id="hint">Toca el sobre para abrir</div>
   </div>
 
@@ -167,17 +228,64 @@
   </audio>
 
   <script>
-    const cover = document.getElementById("cover");
+    const coverClosed = document.getElementById("coverClosed");
+    const coverOpen   = document.getElementById("coverOpen");
     const music = document.getElementById("bg-music");
+    const hint  = document.getElementById("hint");
 
-    cover.addEventListener("click", async () => {
+    let opened = false;
+
+    coverClosed.addEventListener("click", async () => {
+      if (opened) return;
+      opened = true;
+
       try {
-        const hint = document.getElementById("hint");
         if (hint) hint.style.display = "none";
-        if (!music.paused) return;
-        await music.play();
+
+        // 1) feedback táctil
+        coverClosed.classList.add("is-press");
+        setTimeout(() => coverClosed.classList.remove("is-press"), 140);
+
+        // 2) inicia música
+        if (music.paused) {
+          await music.play();
+        }
+
+        // 3) transición: cerrado se va, abierto entra
+        setTimeout(() => {
+          coverClosed.classList.add("is-fadeout");
+          coverOpen.classList.add("is-show");
+        }, 160);
+
+        // 4) dejar el abierto un momento y luego revelar el fondo
+        setTimeout(() => {
+          coverOpen.classList.add("is-reveal");
+        }, 160 + 900); // 900ms visible
+
+        // ocultar ambos al final
+        setTimeout(() => {
+          coverClosed.style.display = "none";
+          coverOpen.style.display = "none";
+        }, 160 + 900 + 650);
+
       } catch (e) {
         console.error("No se pudo reproducir. Verifica el archivo en /assets.", e);
+
+        // Aunque no arranque audio, igual hacemos la transición visual
+        if (hint) hint.style.display = "none";
+        coverClosed.classList.add("is-press");
+        setTimeout(() => coverClosed.classList.remove("is-press"), 140);
+
+        setTimeout(() => {
+          coverClosed.classList.add("is-fadeout");
+          coverOpen.classList.add("is-show");
+        }, 160);
+
+        setTimeout(() => coverOpen.classList.add("is-reveal"), 160 + 900);
+        setTimeout(() => {
+          coverClosed.style.display = "none";
+          coverOpen.style.display = "none";
+        }, 160 + 900 + 650);
       }
     });
 
