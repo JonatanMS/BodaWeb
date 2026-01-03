@@ -191,54 +191,51 @@
         transform 1.10s var(--easeWarm);
     }
 
-/* ===== ✅ "Bienvenidos..." ===== */
-.welcome{
-  position:absolute;
-  left:50%;
-  bottom: 6.8%;
-  transform: translateX(-50%);
+    /* ===== ✅ "Bienvenidos..." (solo entrada hintIn + salida propia) ===== */
+    .welcome{
+      position:absolute;
+      left:50%;
+      bottom: 6.8%;
+      transform: translateX(-50%);
 
-  width: 92%;
-  max-width: 560px;
+      width: 92%;
+      max-width: 560px;
 
-  font-family: "Georgia", "Times New Roman", serif;
-  font-size: 1.15rem;
-  letter-spacing: 1.2px;
+      font-family: "Georgia", "Times New Roman", serif;
+      font-size: 1.15rem;
+      letter-spacing: 1.2px;
 
-  color: rgba(166, 128, 56, .78);
-  text-shadow: 0 1px 0 rgba(255,255,255,.35);
+      color: rgba(166, 128, 56, .78);
+      text-shadow: 0 1px 0 rgba(255,255,255,.35);
 
-  opacity: 0;
-  pointer-events:none;
-  user-select:none;
+      opacity: 0;
+      pointer-events:none;
+      user-select:none;
 
-  /* ✅ CLAVE: transición definida ANTES del cambio (para sincronizar) */
-  transition:
-    opacity 1.10s var(--easeWarm),
-    transform 1.10s var(--easeWarm);
+      animation: none;
+    }
 
-  animation: none;
-}
+    /* Entrada igual que hint */
+    .welcome.is-animate{
+      animation: hintIn .7s ease forwards;
+    }
 
-/* Entrada igual que hint */
-.welcome.is-animate{
-  animation: hintIn .7s ease forwards;
-}
+    /* ✅ Salida (primero se va el texto) */
+    @keyframes welcomeOut{
+      from{ opacity:1; transform: translateX(-50%) translateY(0); }
+      to  { opacity:0; transform: translateX(-50%) translateY(-6px); }
+    }
+    .welcome.is-out{
+      animation: welcomeOut .85s var(--easeWarm) forwards;
+    }
 
-/* ✅ Salida sincronizada (sin transición aquí, ya está en .welcome) */
-.welcome.is-hide{
-  opacity: 0;
-  transform: translateX(-50%) translateY(-6px);
-}
-
-/* móvil */
-@media (max-width: 520px){
-  .welcome{
-    bottom: 10.5%;
-    font-size: 1.00rem;
-    letter-spacing: 1.0px;
-  }
-}
+    @media (max-width: 520px){
+      .welcome{
+        bottom: 10.5%;
+        font-size: 1.00rem;
+        letter-spacing: 1.0px;
+      }
+    }
 
     @media (prefers-reduced-motion: reduce){
       .cover, .cover-open, .welcome{
@@ -292,6 +289,10 @@
       // ✅ Delay tipo "hint": imagen primero, texto después
       const WELCOME_DELAY_AFTER_OPEN = 850; // ajusta 650–1100 a gusto
 
+      // ✅ NUEVO: primero se va el texto, luego el sobre abierto
+      const WELCOME_OUT_MS = 850;   // duración del texto al irse (match con CSS .85s)
+      const GAP_BEFORE_REVEAL = 180; // pequeño respiro antes de irse el sobre
+
       coverClosed.classList.add("is-press");
       setTimeout(() => coverClosed.classList.remove("is-press"), PRESS_MS);
 
@@ -314,17 +315,22 @@
         if (welcome) welcome.classList.add("is-animate");
       }, T0 + CLOSED_FADE_MS + WELCOME_DELAY_AFTER_OPEN);
 
-setTimeout(() => {
-  // ✅ Ambos empiezan a desaparecer exactamente al mismo tiempo
-  coverOpen.classList.add("is-reveal");
-  if (welcome) welcome.classList.add("is-hide");
-}, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS);
+      // ✅ 1) Primero: se va el texto
+      setTimeout(() => {
+        if (welcome) welcome.classList.add("is-out");
+      }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS);
 
+      // ✅ 2) Después: se va el sobre abierto
+      setTimeout(() => {
+        coverOpen.classList.add("is-reveal");
+      }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + WELCOME_OUT_MS + GAP_BEFORE_REVEAL);
+
+      // ocultar al final
       setTimeout(() => {
         coverClosed.style.display = "none";
         coverOpen.style.display = "none";
         if (welcome) welcome.style.display = "none";
-      }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + 1200);
+      }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + WELCOME_OUT_MS + GAP_BEFORE_REVEAL + 1200);
     });
 
     /* ===== Burbujas (sin cambios) ===== */
@@ -512,4 +518,3 @@ setTimeout(() => {
   </script>
 </body>
 </html>
-
