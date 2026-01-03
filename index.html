@@ -11,14 +11,11 @@
   --bChamp: rgba(241,209,138,.32);
   --bCream: rgba(255,248,235,.34);
   --bWhite: rgba(255,255,255,.26);
-
-  /* ✅ easing cálido */
   --easeWarm: cubic-bezier(.18,.86,.22,1);
 }
 
     *{ box-sizing:border-box; }
     img{ max-width:100%; height:auto; }
-
     html, body{ width:100%; height:100%; margin:0; }
 
     body{
@@ -58,7 +55,6 @@
       inset:0;
       z-index:1;
       pointer-events:none;
-
       display:block;
       opacity:0.92;
       mix-blend-mode: normal;
@@ -96,7 +92,6 @@
       max-height: 86svh;
       max-height: 86dvh;
       height: auto;
-
       display:block;
       cursor:pointer;
       user-select:none;
@@ -146,7 +141,6 @@
       to  { opacity:1; transform: translateX(-50%) translateY(0); }
     }
 
-    /* ✅ Móvil: más cerca del sobre */
     @media (max-width: 520px){
       .hint{
         bottom: 14%;
@@ -155,9 +149,8 @@
       }
     }
 
-    /* ===== Transición faseada para que se NOTE ===== */
+    /* ===== Transición ===== */
 
-    /* ✅ Abierto oculto de verdad */
     .cover-open{
       position:absolute;
       opacity:0;
@@ -169,13 +162,11 @@
         transform 1.30s var(--easeWarm);
     }
 
-    /* Feedback táctil */
     .cover.is-press{
       transform: scale(0.985);
       filter: drop-shadow(0 12px 26px rgba(0,0,0,.14));
     }
 
-    /* ✅ Closed fade-out: sin blur fuerte para que se perciba */
     .cover.is-fadeout{
       opacity:0;
       transform: translateY(-6px) scale(0.995);
@@ -186,14 +177,12 @@
         filter 1.30s var(--easeWarm);
     }
 
-    /* ✅ Open entra después */
     .cover-open.is-show{
       opacity:1;
       visibility:visible;
       transform: translateY(0) scale(1);
     }
 
-    /* ✅ Open se va (opcional) */
     .cover-open.is-reveal{
       opacity:0;
       transform: translateY(-10px) scale(1.01);
@@ -202,54 +191,42 @@
         transform 1.10s var(--easeWarm);
     }
 
-    /* ===== ✅ TEXTO: "Bienvenidos a nuestra Historia" ===== */
+    /* ===== ✅ "Bienvenidos..." con MISMO comportamiento que hint ===== */
     .welcome{
       position:absolute;
       left:50%;
-      bottom: 6.8%;                 /* ✅ cerca del sobre abierto */
+      bottom: 6.8%;
       transform: translateX(-50%);
+
       width: 92%;
       max-width: 560px;
 
-      font-family: "Georgia", "Times New Roman", serif; /* ✅ serif elegante */
+      font-family: "Georgia", "Times New Roman", serif;
       font-size: 1.15rem;
-      letter-spacing: 0.9px;
-      text-transform: none;
+      letter-spacing: 1.2px;
 
       color: rgba(166, 128, 56, .78); /* dorado suave */
       text-shadow: 0 1px 0 rgba(255,255,255,.35);
 
-      opacity: 0;
-      visibility: hidden;
+      opacity: 0;              /* ✅ igual que hint: inicia invisible */
       pointer-events:none;
       user-select:none;
 
-      transition:
-        opacity 1.30s var(--easeWarm),
-        transform 1.30s var(--easeWarm);
+      /* ✅ NO animamos por default; lo activamos cuando toque */
+      animation: none;
     }
 
-    /* Aparece cuando el sobre abierto ya está visible */
-    .welcome.is-show{
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
+    /* ✅ cuando toque, usamos EXACTAMENTE la misma animación que hint */
+    .welcome.is-animate{
+      animation: hintIn .7s ease forwards;
     }
 
-    /* Si revelas fondo, se va junto con el sobre abierto */
-    .welcome.is-reveal{
-      opacity: 0;
-      transform: translateX(-50%) translateY(-8px);
-      transition:
-        opacity 1.10s var(--easeWarm),
-        transform 1.10s var(--easeWarm);
-    }
-
+    /* móvil */
     @media (max-width: 520px){
       .welcome{
         bottom: 10.5%;
         font-size: 1.00rem;
-        letter-spacing: 0.7px;
+        letter-spacing: 1.0px;
       }
     }
 
@@ -274,7 +251,7 @@
     <img src="assets/Sobre.png" alt="Sobre abierto" class="cover cover-open" id="coverOpen" />
     <div class="hint" id="hint">Toca el sobre para abrir</div>
 
-    <!-- ✅ NUEVO: texto elegante (sale con el sobre abierto) -->
+    <!-- ✅ NUEVO TEXTO -->
     <div class="welcome" id="welcome">Bienvenidos a nuestra Historia</div>
   </div>
 
@@ -298,50 +275,43 @@
 
       if (hint) hint.style.display = "none";
 
-      /* ✅ Timing por fases (para que se note) */
       const PRESS_MS = 150;
-
-      // Fase A: cerrar se desvanece (visible)
       const CLOSED_FADE_MS = 1400;
-
-      // Fase B: abierto aparece (visible)
       const OPEN_FADE_MS = 1200;
-
-      // Tiempo visible del abierto (calidez)
       const OPEN_HOLD_MS = 2500;
 
-      // 1) feedback táctil
+      // ✅ Delay tipo "hint": imagen primero, texto después
+      const WELCOME_DELAY_AFTER_OPEN = 850; // ajusta 650–1100 a gusto
+
       coverClosed.classList.add("is-press");
       setTimeout(() => coverClosed.classList.remove("is-press"), PRESS_MS);
 
-      // 2) música (intento, sin bloquear animación si falla)
       if (music.paused) {
         music.play().catch(e => console.error("No se pudo reproducir audio:", e));
       }
 
-      // 3) empieza fade-out del cerrado
       const T0 = 120;
+
       setTimeout(() => {
         coverClosed.classList.add("is-fadeout");
       }, T0);
 
-      // 4) cuando ya casi se fue el cerrado, entra el abierto
       setTimeout(() => {
         coverOpen.classList.add("is-show");
       }, T0 + CLOSED_FADE_MS);
 
-      // 4.1) ✅ aparece el texto ligeramente después (cálido)
+      // ✅ Texto aparece DESPUÉS, igual que "hint"
       setTimeout(() => {
-        if (welcome) welcome.classList.add("is-show");
-      }, T0 + CLOSED_FADE_MS + 260);
+        if (welcome) welcome.classList.add("is-animate");
+      }, T0 + CLOSED_FADE_MS + WELCOME_DELAY_AFTER_OPEN);
 
-      // 5) después de verse un buen rato, revelar fondo (opcional)
+      // reveal opcional
       setTimeout(() => {
         coverOpen.classList.add("is-reveal");
-        if (welcome) welcome.classList.add("is-reveal");
+        // también escondemos el texto (simple)
+        if (welcome) welcome.style.opacity = "0";
       }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS);
 
-      // 6) ocultar al final
       setTimeout(() => {
         coverClosed.style.display = "none";
         coverOpen.style.display = "none";
@@ -349,7 +319,7 @@
       }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + 1200);
     });
 
-    /* ===== Tu código de burbujas (sin cambios) ===== */
+    /* ===== Burbujas (sin cambios) ===== */
 
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
