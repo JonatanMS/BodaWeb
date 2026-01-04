@@ -233,13 +233,24 @@ body{
 
 /* =========================================================
    ✅ TRANSICIÓN FLUIDA: IRIS / RADIAL WIPE (UNA SOLA CAPA)
+   ✅ FIX: último “pedacito” -> exterior se vuelve blanco gradual
    ========================================================= */
 
-/* Animable custom property (suaviza MUCHO el crecimiento) */
+/* ✅ Propiedades animables */
 @property --wipeR {
   syntax: "<length>";
   inherits: false;
   initial-value: 90px;
+}
+@property --wipeOuterA {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --wipeSoft {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 160px;
 }
 
 #wipe{
@@ -249,20 +260,26 @@ body{
   pointer-events: none;
   opacity: 0;
 
-  /* punto de origen: esquina superior izquierda */
+  /* origen: esquina superior izquierda */
   --wipeX: 0px;
   --wipeY: 0px;
-  --wipeR: 90px;
 
-  /* Un solo gradiente: al crecer se vuelve blanco TOTAL (sin “pasos”) */
+  /* radio + suavidad */
+  --wipeR: 90px;
+  --wipeSoft: 160px;
+
+  /* opacidad del blanco exterior (0->1 al final) */
+  --wipeOuterA: 0;
+
+  /* ✅ el exterior deja de ser transparente de forma PROGRESIVA */
   background: radial-gradient(
     circle at var(--wipeX) var(--wipeY),
     rgba(255,255,255,1) 0px,
-    rgba(255,255,255,1) calc(var(--wipeR) - 70px),
-    rgba(255,255,255,0) var(--wipeR)
+    rgba(255,255,255,1) calc(var(--wipeR) - var(--wipeSoft)),
+    rgba(255,255,255,var(--wipeOuterA)) var(--wipeR),
+    rgba(255,255,255,var(--wipeOuterA)) 200%
   );
 
-  /* toque lens súper suave, sin amarillos raros */
   filter: blur(0px);
   will-change: opacity, filter, background;
 }
@@ -297,18 +314,30 @@ body.is-wiping #coverWrap{
   opacity: .15;
 }
 
+/* ✅ Animación: crece + “cierra” exterior hacia blanco */
 @keyframes wipeGrow{
   0%{
     --wipeR: 90px;
+    --wipeOuterA: 0;
+    --wipeSoft: 160px;
     filter: blur(0px);
   }
   55%{
-    --wipeR: 75vmax;
+    --wipeR: 85vmax;
+    --wipeOuterA: 0;
+    --wipeSoft: 200px;
     filter: blur(10px);
   }
+  85%{
+    --wipeR: 150vmax;
+    --wipeOuterA: .55;
+    --wipeSoft: 240px;
+    filter: blur(14px);
+  }
   100%{
-    /* grande para cubrir TODO dispositivo */
-    --wipeR: 160vmax;
+    --wipeR: 260vmax;   /* ✅ más grande para cualquier pantalla */
+    --wipeOuterA: 1;    /* ✅ full blanco, cero transparencia */
+    --wipeSoft: 260px;
     filter: blur(18px);
   }
 }
@@ -360,7 +389,7 @@ body.is-wiping #coverWrap{
       // duración global para blur + wipe
       document.documentElement.style.setProperty("--wipeDur", duration + "ms");
 
-      // origen top-left consistente en cualquier dispositivo
+      // origen top-left consistente
       if (wipe){
         wipe.style.setProperty("--wipeX", "0px");
         wipe.style.setProperty("--wipeY", "0px");
@@ -370,7 +399,6 @@ body.is-wiping #coverWrap{
 
       // al terminar: dejar todo BLANCO (y listo para mostrar tu contenido real)
       window.setTimeout(() => {
-        // fondo final blanco
         document.body.style.background = "#fff";
 
         const canvas = document.getElementById("bubblesCanvas");
@@ -407,7 +435,7 @@ body.is-wiping #coverWrap{
       const GAP_BEFORE_REVEAL = 180;
 
       // ✅ más lenta y “humana”
-      const WIPE_MS = 3800; // prueba 3600–4200
+      const WIPE_MS = 3800; // prueba 3800–4500 si quieres aún más cine
 
       coverClosed.classList.add("is-press");
       setTimeout(() => coverClosed.classList.remove("is-press"), PRESS_MS);
