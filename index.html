@@ -14,414 +14,315 @@
   --easeWarm: cubic-bezier(.18,.86,.22,1);
 }
 
-    *{ box-sizing:border-box; }
-    img{ max-width:100%; height:auto; }
-    html, body{ width:100%; height:100%; margin:0; }
+*{ box-sizing:border-box; }
+img{ max-width:100%; height:auto; }
+html, body{ width:100%; height:100%; margin:0; }
 
-    body{
-      display:grid;
-      place-items:center;
+body{
+  display:grid;
+  place-items:center;
 
-      min-height:100vh;
-      min-height:100svh;
-      min-height:100dvh;
+  min-height:100vh;
+  min-height:100svh;
+  min-height:100dvh;
 
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:#fff;
-      overflow:hidden;
-      padding:18px;
-      text-align:center;
-      color:#222;
-      position:relative;
-    }
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:#fff;
+  overflow:hidden;
+  padding:18px;
+  text-align:center;
+  color:#222;
+  position:relative;
+}
 
-    .bg-base{
-      position:fixed;
-      inset:0;
-      z-index:0;
-      background: linear-gradient(135deg,
-        #ffffff 0%,
-        #fff6e6 25%,
-        #f1d18a 55%,
-        #fffaf1 80%,
-        #ffffff 100%);
-      background-size:300% 300%;
-      animation: baseMove 7s ease-in-out infinite;
-      pointer-events:none;
-      will-change: filter, opacity;
-    }
+/* Fondo base */
+.bg-base{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background: linear-gradient(135deg,
+    #ffffff 0%,
+    #fff6e6 25%,
+    #f1d18a 55%,
+    #fffaf1 80%,
+    #ffffff 100%);
+  background-size:300% 300%;
+  animation: baseMove 7s ease-in-out infinite;
+  pointer-events:none;
+  will-change: filter, opacity;
+}
 
-    #bubblesCanvas{
-      position:fixed;
-      inset:0;
-      z-index:1;
-      pointer-events:none;
-      display:block;
-      opacity:0.92;
-      mix-blend-mode: normal;
-      filter: saturate(1.06) contrast(1.10);
-      will-change: filter, opacity;
-    }
+#bubblesCanvas{
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  display:block;
+  opacity:0.92;
+  mix-blend-mode: normal;
+  filter: saturate(1.06) contrast(1.10);
+  will-change: filter, opacity;
+}
 
-    .shimmer{
-      position:fixed;
-      inset:-25%;
-      z-index:2;
-      pointer-events:none;
-      background: linear-gradient(115deg,
-        rgba(255,255,255,0) 0%,
-        rgba(241,209,138,.65) 45%,
-        rgba(255,255,255,0) 60%
-      );
-      filter: blur(10px);
-      opacity:.5;
-      animation: shimmerMove 7s ease-in-out infinite;
-      will-change: filter, opacity, transform;
-    }
+.shimmer{
+  position:fixed;
+  inset:-25%;
+  z-index:2;
+  pointer-events:none;
+  background: linear-gradient(115deg,
+    rgba(255,255,255,0) 0%,
+    rgba(241,209,138,.65) 45%,
+    rgba(255,255,255,0) 60%
+  );
+  filter: blur(10px);
+  opacity:.5;
+  animation: shimmerMove 7s ease-in-out infinite;
+  will-change: filter, opacity, transform;
+}
 
-    @keyframes baseMove{
-      0%{ background-position:0% 50%; }
-      50%{ background-position:100% 50%; }
-      100%{ background-position:0% 50%; }
-    }
-    @keyframes shimmerMove{
-      0%{ transform:translateX(-40%) rotate(6deg); }
-      50%{ transform:translateX(10%) rotate(6deg); }
-      100%{ transform:translateX(45%) rotate(6deg); }
-    }
+@keyframes baseMove{
+  0%{ background-position:0% 50%; }
+  50%{ background-position:100% 50%; }
+  100%{ background-position:0% 50%; }
+}
+@keyframes shimmerMove{
+  0%{ transform:translateX(-40%) rotate(6deg); }
+  50%{ transform:translateX(10%) rotate(6deg); }
+  100%{ transform:translateX(45%) rotate(6deg); }
+}
 
-    .cover{
-      width: min(720px, 92vw);
-      max-height: 86svh;
-      max-height: 86dvh;
-      height: auto;
-      display:block;
-      cursor:pointer;
-      user-select:none;
-      -webkit-user-drag:none;
+/* Sobres */
+.cover{
+  width: min(720px, 92vw);
+  max-height: 86svh;
+  max-height: 86dvh;
+  height: auto;
+  display:block;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-drag:none;
 
-      filter: drop-shadow(0 18px 35px rgba(0,0,0,.16));
-      transition: transform .25s ease, filter .25s ease, opacity .25s ease;
-      will-change: transform, opacity, filter;
-    }
+  filter: drop-shadow(0 18px 35px rgba(0,0,0,.16));
+  transition: transform .25s ease, filter .25s ease, opacity .25s ease;
+  will-change: transform, opacity, filter;
+}
+@media (min-width: 900px){
+  .cover{ width: clamp(468px, 34vw, 684px); max-height: 82vh; }
+}
+@media (max-width: 520px){
+  .cover{ width: 92vw; max-height: 84svh; max-height: 84dvh; }
+}
 
-    @media (min-width: 900px){
-      .cover{ width: clamp(468px, 34vw, 684px); max-height: 82vh; }
-    }
-    @media (max-width: 520px){
-      .cover{ width: 92vw; max-height: 84svh; max-height: 84dvh; }
-    }
+.cover-wrap{
+  position: relative;
+  display: grid;
+  place-items: center;
+  z-index:10;
+  will-change: filter, opacity;
+}
 
-    .cover-wrap{
-      position: relative;
-      display: grid;
-      place-items: center;
-      z-index:10;
-      will-change: filter, opacity;
-    }
+.hint{
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 520px;
 
-    .hint{
-      position: absolute;
-      left: 50%;
-      bottom: 10%;
-      transform: translateX(-50%);
-      width: 92%;
-      max-width: 520px;
+  font-size: 1.15rem;
+  letter-spacing: 1.6px;
+  color: rgba(80,80,80,.72);
+  text-transform: uppercase;
 
-      font-size: 1.15rem;
-      letter-spacing: 1.6px;
-      color: rgba(80,80,80,.72);
-      text-transform: uppercase;
+  opacity: 0;
+  animation: hintIn .7s ease forwards;
+  animation-delay: 1s;
 
-      opacity: 0;
-      animation: hintIn .7s ease forwards;
-      animation-delay: 1s;
+  pointer-events: none;
+  user-select: none;
+}
+@keyframes hintIn{
+  from{ opacity:0; transform: translateX(-50%) translateY(6px); }
+  to  { opacity:1; transform: translateX(-50%) translateY(0); }
+}
+@media (max-width: 520px){
+  .hint{
+    bottom: 14%;
+    font-size: .95rem;
+    letter-spacing: 1.2px;
+  }
+}
 
-      pointer-events: none;
-      user-select: none;
-    }
+/* Transición sobres */
+.cover-open{
+  position:absolute;
+  opacity:0;
+  visibility:hidden;
+  transform: translateY(10px) scale(0.99);
+  pointer-events:none;
+  transition:
+    opacity 1.30s var(--easeWarm),
+    transform 1.30s var(--easeWarm);
+}
+.cover.is-press{
+  transform: scale(0.985);
+  filter: drop-shadow(0 12px 26px rgba(0,0,0,.14));
+}
+.cover.is-fadeout{
+  opacity:0;
+  transform: translateY(-6px) scale(0.995);
+  filter: drop-shadow(0 18px 35px rgba(0,0,0,.12));
+  transition:
+    opacity 1.30s var(--easeWarm),
+    transform 1.30s var(--easeWarm),
+    filter 1.30s var(--easeWarm);
+}
+.cover-open.is-show{
+  opacity:1;
+  visibility:visible;
+  transform: translateY(0) scale(1);
+}
+.cover-open.is-reveal{
+  opacity:0;
+  transform: translateY(-10px) scale(1.01);
+  transition:
+    opacity 1.10s var(--easeWarm),
+    transform 1.10s var(--easeWarm);
+}
 
-    @keyframes hintIn{
-      from{ opacity:0; transform: translateX(-50%) translateY(6px); }
-      to  { opacity:1; transform: translateX(-50%) translateY(0); }
-    }
+/* Texto Bienvenidos */
+.welcome{
+  position:absolute;
+  left:50%;
+  bottom: 6.8%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 560px;
 
-    @media (max-width: 520px){
-      .hint{
-        bottom: 14%;
-        font-size: .95rem;
-        letter-spacing: 1.2px;
-      }
-    }
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 1.15rem;
+  letter-spacing: 1.2px;
 
-    /* ===== Transición sobres ===== */
+  color: rgba(166, 128, 56, .78);
+  text-shadow: 0 1px 0 rgba(255,255,255,.35);
 
-    .cover-open{
-      position:absolute;
-      opacity:0;
-      visibility:hidden;
-      transform: translateY(10px) scale(0.99);
-      pointer-events:none;
-      transition:
-        opacity 1.30s var(--easeWarm),
-        transform 1.30s var(--easeWarm);
-    }
+  opacity: 0;
+  pointer-events:none;
+  user-select:none;
 
-    .cover.is-press{
-      transform: scale(0.985);
-      filter: drop-shadow(0 12px 26px rgba(0,0,0,.14));
-    }
+  animation: none;
+  will-change: opacity, transform;
+}
+.welcome.is-animate{
+  animation: hintIn .7s ease forwards;
+}
+@keyframes welcomeOut{
+  from{ opacity:1; transform: translateX(-50%) translateY(0); }
+  to  { opacity:0; transform: translateX(-50%) translateY(-6px); }
+}
+.welcome.is-out{
+  animation: welcomeOut .85s var(--easeWarm) forwards;
+}
+@media (max-width: 520px){
+  .welcome{
+    bottom: 10.5%;
+    font-size: 1.00rem;
+    letter-spacing: 1.0px;
+  }
+}
 
-    .cover.is-fadeout{
-      opacity:0;
-      transform: translateY(-6px) scale(0.995);
-      filter: drop-shadow(0 18px 35px rgba(0,0,0,.12));
-      transition:
-        opacity 1.30s var(--easeWarm),
-        transform 1.30s var(--easeWarm),
-        filter 1.30s var(--easeWarm);
-    }
+/* =========================================================
+   ✅ TRANSICIÓN FLUIDA: IRIS / RADIAL WIPE (UNA SOLA CAPA)
+   ========================================================= */
 
-    .cover-open.is-show{
-      opacity:1;
-      visibility:visible;
-      transform: translateY(0) scale(1);
-    }
+/* Animable custom property (suaviza MUCHO el crecimiento) */
+@property --wipeR {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 90px;
+}
 
-    .cover-open.is-reveal{
-      opacity:0;
-      transform: translateY(-10px) scale(1.01);
-      transition:
-        opacity 1.10s var(--easeWarm),
-        transform 1.10s var(--easeWarm);
-    }
+#wipe{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
 
-    /* ===== Texto Bienvenidos ===== */
-    .welcome{
-      position:absolute;
-      left:50%;
-      bottom: 6.8%;
-      transform: translateX(-50%);
-      width: 92%;
-      max-width: 560px;
+  /* punto de origen: esquina superior izquierda */
+  --wipeX: 0px;
+  --wipeY: 0px;
+  --wipeR: 90px;
 
-      font-family: "Georgia", "Times New Roman", serif;
-      font-size: 1.15rem;
-      letter-spacing: 1.2px;
+  /* Un solo gradiente: al crecer se vuelve blanco TOTAL (sin “pasos”) */
+  background: radial-gradient(
+    circle at var(--wipeX) var(--wipeY),
+    rgba(255,255,255,1) 0px,
+    rgba(255,255,255,1) calc(var(--wipeR) - 70px),
+    rgba(255,255,255,0) var(--wipeR)
+  );
 
-      color: rgba(166, 128, 56, .78);
-      text-shadow: 0 1px 0 rgba(255,255,255,.35);
+  /* toque lens súper suave, sin amarillos raros */
+  filter: blur(0px);
+  will-change: opacity, filter, background;
+}
 
-      opacity: 0;
-      pointer-events:none;
-      user-select:none;
+/* activación */
+body.is-wiping #wipe{
+  opacity: 1;
+  animation: wipeGrow var(--wipeDur, 3600ms) var(--easeWarm) forwards;
+}
 
-      animation: none;
-      will-change: opacity, transform;
-    }
+/* blur progresivo del “mundo” mientras entra el wipe */
+.bg-base, #bubblesCanvas, .shimmer, #coverWrap{
+  transition:
+    filter var(--wipeDur, 3600ms) var(--easeWarm),
+    opacity var(--wipeDur, 3600ms) var(--easeWarm);
+}
 
-    .welcome.is-animate{
-      animation: hintIn .7s ease forwards;
-    }
+body.is-wiping #bubblesCanvas{
+  filter: saturate(1.03) contrast(1.07) blur(18px);
+  opacity: .25;
+}
+body.is-wiping .shimmer{
+  filter: blur(28px);
+  opacity: .10;
+}
+body.is-wiping .bg-base{
+  filter: blur(16px);
+  opacity: .30;
+}
+body.is-wiping #coverWrap{
+  filter: blur(14px);
+  opacity: .15;
+}
 
-    @keyframes welcomeOut{
-      from{ opacity:1; transform: translateX(-50%) translateY(0); }
-      to  { opacity:0; transform: translateX(-50%) translateY(-6px); }
-    }
-    .welcome.is-out{
-      animation: welcomeOut .85s var(--easeWarm) forwards;
-    }
+@keyframes wipeGrow{
+  0%{
+    --wipeR: 90px;
+    filter: blur(0px);
+  }
+  55%{
+    --wipeR: 75vmax;
+    filter: blur(10px);
+  }
+  100%{
+    /* grande para cubrir TODO dispositivo */
+    --wipeR: 160vmax;
+    filter: blur(18px);
+  }
+}
 
-    @media (max-width: 520px){
-      .welcome{
-        bottom: 10.5%;
-        font-size: 1.00rem;
-        letter-spacing: 1.0px;
-      }
-    }
-
-    /* =========================================
-       ✅ TRANSICIÓN SOL / LENTE (CÍRCULO BLANCO QUE CRECE)
-       ========================================= */
-
-    #sunTransition{
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      pointer-events: none;
-      visibility: hidden;   /* ✅ oculto hasta activarse */
-    }
-
-    body.is-sun-transition #sunTransition{
-      visibility: visible;
-    }
-
-    /* Círculo blanco que “pinta” la pantalla */
-    #sunTransition .sun-fill{
-      position:absolute;
-      left:0;
-      top:0;
-
-      width: 240vmax;
-      height: 240vmax;
-      border-radius: 50%;
-
-      transform: translate(-50%, -50%) scale(0.012);
-      transform-origin: 50% 50%;
-
-      background: #fff;
-      opacity: .92;
-
-      filter: blur(0px);
-      will-change: transform, opacity, filter;
-    }
-
-    /* Núcleo brillante */
-    #sunTransition .sun-core{
-      position:absolute;
-      left:0;
-      top:0;
-
-      width: 36vmax;
-      height: 36vmax;
-      border-radius: 50%;
-
-      transform: translate(-50%, -50%) scale(0.12);
-      transform-origin: 50% 50%;
-
-      background: radial-gradient(circle at 40% 40%,
-        rgba(255,255,255,1) 0%,
-        rgba(255,255,255,.95) 22%,
-        rgba(255,255,255,.55) 48%,
-        rgba(255,255,255,0) 72%
-      );
-
-      opacity: 0;
-      filter: blur(2px);
-      will-change: transform, opacity, filter;
-    }
-
-    /* Haz de luz (beam) */
-    #sunTransition .sun-beam{
-      position:absolute;
-      left:0;
-      top:0;
-
-      width: 190vmax;
-      height: 55vmax;
-
-      transform-origin: 0 50%;
-      transform: translate(-18%, -35%) rotate(14deg) scaleX(0.04);
-
-      opacity: 0;
-      filter: blur(18px);
-      will-change: transform, opacity;
-
-      background: linear-gradient(90deg,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,.45) 22%,
-        rgba(255,255,255,.18) 50%,
-        rgba(255,255,255,0) 100%
-      );
-    }
-
-    /* Animaciones al activarse */
-    body.is-sun-transition #sunTransition .sun-fill{
-      animation: sunFillGrow var(--sunDur, 4200ms) var(--easeWarm) forwards;
-    }
-    body.is-sun-transition #sunTransition .sun-core{
-      animation: sunCoreGrow var(--sunDur, 4200ms) var(--easeWarm) forwards;
-    }
-    body.is-sun-transition #sunTransition .sun-beam{
-      animation: sunBeamGrow var(--sunDur, 4200ms) var(--easeWarm) forwards;
-    }
-
-    /* ✅ Blur REAL del fondo (subido para que SÍ se note) */
-    body.is-sun-transition #bubblesCanvas{
-      animation: blurBubbles var(--sunDur, 4200ms) var(--easeWarm) forwards;
-    }
-    body.is-sun-transition .shimmer{
-      animation: blurShimmer var(--sunDur, 4200ms) var(--easeWarm) forwards;
-    }
-    body.is-sun-transition #coverWrap{
-      animation: blurContent var(--sunDur, 4200ms) var(--easeWarm) forwards;
-    }
-    body.is-sun-transition .bg-base{
-      animation: blurBase var(--sunDur, 4200ms) var(--easeWarm) forwards;
-    }
-
-    /* Círculo blanco creciendo (LENTO y VISIBLE) */
-    @keyframes sunFillGrow{
-      0%{
-        opacity:.92;
-        transform: translate(-50%, -50%) scale(0.012);
-        filter: blur(0px);
-      }
-      40%{
-        opacity:.88;
-        transform: translate(-50%, -50%) scale(0.35);
-        filter: blur(6px);
-      }
-      75%{
-        opacity:.94;
-        transform: translate(-50%, -50%) scale(0.85);
-        filter: blur(10px);
-      }
-      100%{
-        opacity:1;
-        transform: translate(-50%, -50%) scale(1.02);
-        filter: blur(0px);
-      }
-    }
-
-    /* Núcleo aparece temprano, luego se “disuelve” */
-    @keyframes sunCoreGrow{
-      0%{ opacity:0; transform: translate(-50%, -50%) scale(0.12); filter: blur(2px); }
-      10%{ opacity:.95; }
-      60%{ opacity:.55; transform: translate(-50%, -50%) scale(1.05); filter: blur(12px); }
-      100%{ opacity:0; transform: translate(-50%, -50%) scale(1.35); filter: blur(18px); }
-    }
-
-    /* Haz de luz crece progresivo */
-    @keyframes sunBeamGrow{
-      0%{ opacity:0; transform: translate(-18%, -35%) rotate(14deg) scaleX(0.04); }
-      18%{ opacity:.25; }
-      55%{ opacity:.55; transform: translate(-12%, -30%) rotate(14deg) scaleX(0.65); }
-      100%{ opacity:.35; transform: translate(-8%, -26%) rotate(14deg) scaleX(1.02); }
-    }
-
-    /* Blurs progresivos (más fuertes para que se noten) */
-    @keyframes blurBubbles{
-      0%{ filter: saturate(1.06) contrast(1.10) blur(0px); opacity: .92; }
-      45%{ filter: saturate(1.04) contrast(1.08) blur(14px); opacity: .72; }
-      100%{ filter: saturate(1.02) contrast(1.05) blur(28px); opacity: .18; }
-    }
-    @keyframes blurShimmer{
-      0%{ filter: blur(10px); opacity: .50; }
-      55%{ filter: blur(28px); opacity: .22; }
-      100%{ filter: blur(40px); opacity: .08; }
-    }
-    @keyframes blurContent{
-      0%{ filter: blur(0px); opacity: 1; }
-      60%{ filter: blur(12px); opacity: .55; }
-      100%{ filter: blur(20px); opacity: .12; }
-    }
-    @keyframes blurBase{
-      0%{ filter: blur(0px); opacity: 1; }
-      65%{ filter: blur(14px); opacity: .65; }
-      100%{ filter: blur(20px); opacity: .18; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .cover, .cover-open, .welcome,
-      #sunTransition, #sunTransition * ,
-      #bubblesCanvas, .shimmer, #coverWrap, .bg-base{
-        transition:none !important;
-        animation:none !important;
-        filter:none !important;
-        transform:none !important;
-      }
-    }
+@media (prefers-reduced-motion: reduce){
+  .cover, .cover-open, .welcome,
+  #wipe,
+  #bubblesCanvas, .shimmer, #coverWrap, .bg-base{
+    transition:none !important;
+    animation:none !important;
+    filter:none !important;
+    transform:none !important;
+  }
+}
   </style>
 </head>
 
@@ -437,12 +338,8 @@
     <div class="welcome" id="welcome">Bienvenidos a nuestra Historia</div>
   </div>
 
-  <!-- ✅ Sol / Lente (círculo blanco creciendo) -->
-  <div id="sunTransition" aria-hidden="true">
-    <div class="sun-fill"></div>
-    <div class="sun-beam"></div>
-    <div class="sun-core"></div>
-  </div>
+  <!-- ✅ Wipe overlay -->
+  <div id="wipe" aria-hidden="true"></div>
 
   <audio id="bg-music" preload="auto">
     <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
@@ -455,18 +352,27 @@
     const music = document.getElementById("bg-music");
     const hint  = document.getElementById("hint");
     const welcome = document.getElementById("welcome");
+    const wipe = document.getElementById("wipe");
 
     let opened = false;
 
-    function runSunTransition({ duration = 4200 } = {}) {
-      document.documentElement.style.setProperty("--sunDur", duration + "ms");
-      const sun = document.getElementById("sunTransition");
-      if (sun) sun.style.display = "block";
+    function runWipeTransition({ duration = 3600 } = {}) {
+      // duración global para blur + wipe
+      document.documentElement.style.setProperty("--wipeDur", duration + "ms");
 
-      document.body.classList.add("is-sun-transition");
+      // origen top-left consistente en cualquier dispositivo
+      if (wipe){
+        wipe.style.setProperty("--wipeX", "0px");
+        wipe.style.setProperty("--wipeY", "0px");
+      }
 
-      // ✅ al terminar: dejamos todo blanco y quitamos overlay (sin parar música)
+      document.body.classList.add("is-wiping");
+
+      // al terminar: dejar todo BLANCO (y listo para mostrar tu contenido real)
       window.setTimeout(() => {
+        // fondo final blanco
+        document.body.style.background = "#fff";
+
         const canvas = document.getElementById("bubblesCanvas");
         const shimmer = document.querySelector(".shimmer");
         const bg = document.querySelector(".bg-base");
@@ -477,13 +383,10 @@
         if (bg) bg.style.display = "none";
         if (wrap) wrap.style.display = "none";
 
-        // ocultamos el overlay para que puedas mostrar contenido sin que lo tape
-        document.body.classList.remove("is-sun-transition");
-        if (sun) sun.style.display = "none";
-
-        // Aquí mostrarías tu contenido real:
+        // IMPORTANTE: NO tocamos la música, sigue.
+        // Aquí luego metes tu segunda "página" / contenido:
         // document.getElementById("contenido").style.display = "block";
-      }, duration + 40);
+      }, duration);
     }
 
     coverClosed.addEventListener("click", async () => {
@@ -500,11 +403,11 @@
       const WELCOME_DELAY_AFTER_OPEN = 850;
 
       // primero texto, luego sobre
-      const WELCOME_OUT_MS = 850;     // coincide con .85s
+      const WELCOME_OUT_MS = 850;   // coincide con .85s
       const GAP_BEFORE_REVEAL = 180;
 
-      // ✅ MÁS LENTO (ojo humano)
-      const SUN_MS = 4200;            // prueba 3800–5200
+      // ✅ más lenta y “humana”
+      const WIPE_MS = 3800; // prueba 3600–4200
 
       coverClosed.classList.add("is-press");
       setTimeout(() => coverClosed.classList.remove("is-press"), PRESS_MS);
@@ -515,35 +418,38 @@
 
       const T0 = 120;
 
+      // cerrado se va
       setTimeout(() => {
         coverClosed.classList.add("is-fadeout");
       }, T0);
 
+      // abierto aparece
       setTimeout(() => {
         coverOpen.classList.add("is-show");
       }, T0 + CLOSED_FADE_MS);
 
+      // texto aparece después
       setTimeout(() => {
         if (welcome) welcome.classList.add("is-animate");
       }, T0 + CLOSED_FADE_MS + WELCOME_DELAY_AFTER_OPEN);
 
-      // 1) se va el texto
+      // texto se va
       setTimeout(() => {
         if (welcome) welcome.classList.add("is-out");
       }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS);
 
-      // 2) se va el sobre abierto
+      // sobre abierto se va
       const REVEAL_AT = T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + WELCOME_OUT_MS + GAP_BEFORE_REVEAL;
       setTimeout(() => {
         coverOpen.classList.add("is-reveal");
       }, REVEAL_AT);
 
-      // 3) inicia sol/lente cuando el sobre YA está yéndose
+      // ✅ arranca wipe cuando el sobre ya está yéndose
       setTimeout(() => {
-        runSunTransition({ duration: SUN_MS });
+        runWipeTransition({ duration: WIPE_MS });
       }, REVEAL_AT + 120);
 
-      // ocultar imágenes al final (ya no estorban)
+      // limpiar sobres (no estorban)
       setTimeout(() => {
         coverClosed.style.display = "none";
         coverOpen.style.display = "none";
@@ -552,7 +458,6 @@
     });
 
     /* ===== Burbujas (sin cambios) ===== */
-
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (!reduceMotion) {
