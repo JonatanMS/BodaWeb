@@ -12,11 +12,18 @@
   --bCream: rgba(255,248,235,.34);
   --bWhite: rgba(255,255,255,.26);
   --easeWarm: cubic-bezier(.18,.86,.22,1);
+
+  /* Página blanca (sitio) */
+  --siteText: #222;
+  --siteMuted: rgba(0,0,0,.60);
+  --siteLine: rgba(0,0,0,.10);
+  --siteMax: 1080px;
 }
 
 *{ box-sizing:border-box; }
 img{ max-width:100%; height:auto; }
 html, body{ width:100%; height:100%; margin:0; }
+html{ scroll-behavior:smooth; }
 
 body{
   display:grid;
@@ -34,6 +41,10 @@ body{
   color:#222;
   position:relative;
 }
+
+/* ===========================
+   PORTADA (sobre) + fondo
+   =========================== */
 
 /* Fondo base */
 .bg-base{
@@ -213,16 +224,14 @@ body{
   animation: none;
   will-change: opacity, transform;
 }
-.welcome.is-animate{
-  animation: hintIn .7s ease forwards;
-}
+.welcome.is-animate{ animation: hintIn .7s ease forwards; }
+
 @keyframes welcomeOut{
   from{ opacity:1; transform: translateX(-50%) translateY(0); }
   to  { opacity:0; transform: translateX(-50%) translateY(-6px); }
 }
-.welcome.is-out{
-  animation: welcomeOut .85s var(--easeWarm) forwards;
-}
+.welcome.is-out{ animation: welcomeOut .85s var(--easeWarm) forwards; }
+
 @media (max-width: 520px){
   .welcome{
     bottom: 10.5%;
@@ -233,7 +242,7 @@ body{
 
 /* =========================================================
    ✅ WIPE ROBUSTO (cross-browser): scale + feather + blanco sólido
-   ✅ FIX “pedacito”: capa full-white entra antes del final
+   ✅ Ajustado para NO “brincar” a blanco (entra al final)
    ========================================================= */
 
 #wipe{
@@ -281,9 +290,7 @@ body{
   will-change: opacity;
 }
 
-body.is-wiping #wipe{
-  opacity: 1;
-}
+body.is-wiping #wipe{ opacity: 1; }
 
 body.is-wiping #wipe::before{
   animation: wipeExpand var(--wipeDur, 3600ms) var(--easeWarm) forwards;
@@ -313,9 +320,9 @@ body.is-wiping #wipe::after{
 
 @keyframes wipeFullWhite{
   0%   { opacity:0; }
-  55%  { opacity:0; }
-  78%  { opacity:0.70; }
-  90%  { opacity:1; }
+  80%  { opacity:0; }
+  92%  { opacity:0.25; }
+  97%  { opacity:0.70; }
   100% { opacity:1; }
 }
 
@@ -343,6 +350,125 @@ body.is-wiping #coverWrap{
   opacity: .15;
 }
 
+/* ===========================
+   SITIO (pantalla blanca)
+   =========================== */
+
+#site{
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;            /* se muestra al terminar wipe */
+  background: #fff;
+  color: var(--siteText);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.site-shell{
+  max-width: var(--siteMax);
+  margin: 0 auto;
+  padding: 28px 18px 60px;
+}
+
+.site-header{
+  text-align:center;
+  padding-top: 10px;
+}
+
+.couple-name{
+  font-family: "Georgia", "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  font-size: clamp(22px, 3.2vw, 34px);
+  margin: 8px 0 14px;
+}
+
+.nav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border-top: 1px solid var(--siteLine);
+  border-bottom: 1px solid var(--siteLine);
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.nav a{
+  text-decoration:none;
+  color: var(--siteMuted);
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 6px;
+  position: relative;
+}
+
+.nav a::after{
+  content:"";
+  position:absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 4px;
+  height: 1px;
+  background: rgba(0,0,0,.16);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .22s ease;
+}
+
+.nav a:hover::after,
+.nav a:focus-visible::after{
+  transform: scaleX(1);
+}
+
+.nav-toggle{
+  display:none;
+  border: 1px solid var(--siteLine);
+  background:#fff;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  letter-spacing: .8px;
+}
+
+@media (max-width: 640px){
+  .nav{
+    display:none;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+  }
+  .nav.is-open{ display:flex; }
+  .nav-toggle{
+    display:inline-block;
+    margin: 6px auto 10px;
+  }
+}
+
+/* placeholder sections */
+.section{
+  padding: 54px 4px;
+  max-width: 920px;
+  margin: 0 auto;
+  text-align:left;
+}
+.section h2{
+  font-family: "Georgia", "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  margin: 0 0 10px;
+}
+.section p{
+  margin: 0;
+  color: var(--siteMuted);
+  line-height: 1.6;
+}
+
 @media (prefers-reduced-motion: reduce){
   .cover, .cover-open, .welcome,
   #wipe,
@@ -357,6 +483,7 @@ body.is-wiping #coverWrap{
 </head>
 
 <body>
+  <!-- PORTADA -->
   <div class="bg-base"></div>
   <canvas id="bubblesCanvas"></canvas>
   <div class="shimmer"></div>
@@ -368,8 +495,50 @@ body.is-wiping #coverWrap{
     <div class="welcome" id="welcome">Bienvenidos a nuestra Historia</div>
   </div>
 
-  <!-- ✅ Wipe overlay -->
+  <!-- WIPE overlay -->
   <div id="wipe" aria-hidden="true"></div>
+
+  <!-- SITIO (PANTALLA BLANCA) -->
+  <main id="site" aria-hidden="true">
+    <div class="site-shell">
+      <header class="site-header" id="home">
+        <div class="couple-name">VALERIA &amp; JONATAN</div>
+
+        <button class="nav-toggle" id="navToggle" type="button" aria-controls="nav" aria-expanded="false">
+          Menú
+        </button>
+
+        <nav class="nav" id="nav">
+          <a href="#home">Home</a>
+          <a href="#fecha">Fecha</a>
+          <a href="#lugar">Lugar</a>
+          <a href="#itinerario">Itinerario</a>
+          <a href="#dresscode">Dress Code</a>
+        </nav>
+      </header>
+
+      <!-- Placeholders (para probar scroll). Luego los reemplazamos por tu contenido real -->
+      <section class="section" id="fecha">
+        <h2>Fecha</h2>
+        <p>Sección placeholder. Aquí irá el bloque de “Save the date”, fecha grande y el contador.</p>
+      </section>
+
+      <section class="section" id="lugar">
+        <h2>Lugar</h2>
+        <p>Sección placeholder. Aquí irá el mapa de Google Maps, foto del salón y la iglesia.</p>
+      </section>
+
+      <section class="section" id="itinerario">
+        <h2>Itinerario</h2>
+        <p>Sección placeholder. Aquí irá la imagen del itinerario.</p>
+      </section>
+
+      <section class="section" id="dresscode">
+        <h2>Dress Code</h2>
+        <p>Sección placeholder. Aquí irá el dress code.</p>
+      </section>
+    </div>
+  </main>
 
   <audio id="bg-music" preload="auto">
     <source src="assets/MusicaparaBoda.m4a" type="audio/mp4">
@@ -383,15 +552,28 @@ body.is-wiping #coverWrap{
     const hint  = document.getElementById("hint");
     const welcome = document.getElementById("welcome");
 
+    const site = document.getElementById("site");
+    const nav = document.getElementById("nav");
+    const navToggle = document.getElementById("navToggle");
+
     let opened = false;
 
+    function showSite(){
+      // mostrar el sitio ya en blanco
+      if (site){
+        site.style.display = "block";
+        site.removeAttribute("aria-hidden");
+      }
+      // permitir scroll en el sitio
+      document.body.style.overflow = "hidden";
+    }
+
     function runWipeTransition({ duration = 3600 } = {}) {
-      // duración global para blur + wipe
       document.documentElement.style.setProperty("--wipeDur", duration + "ms");
       document.body.classList.add("is-wiping");
 
-      // Para que se vea blanco “completo” antes (y no hasta el último ms)
-      const HIDE_AT = Math.round(duration * 0.86);
+      // Ocultar “mundo” casi al final para evitar salto a blanco
+      const HIDE_AT = Math.round(duration * 0.97);
 
       window.setTimeout(() => {
         document.body.style.background = "#fff";
@@ -406,9 +588,7 @@ body.is-wiping #coverWrap{
         if (bg) bg.style.display = "none";
         if (wrap) wrap.style.display = "none";
 
-        // IMPORTANTE: NO tocamos la música, sigue.
-        // Aquí luego metes tu segunda "página" / contenido:
-        // document.getElementById("contenido").style.display = "block";
+        showSite();
       }, HIDE_AT);
     }
 
@@ -429,8 +609,7 @@ body.is-wiping #coverWrap{
       const WELCOME_OUT_MS = 850;   // coincide con .85s
       const GAP_BEFORE_REVEAL = 180;
 
-      // ✅ más lenta y “humana”
-      const WIPE_MS = 3800; // prueba 3800–4500 si quieres aún más cine
+      const WIPE_MS = 3800; // 3800–4500 si quieres más “cine”
 
       coverClosed.classList.add("is-press");
       setTimeout(() => coverClosed.classList.remove("is-press"), PRESS_MS);
@@ -467,7 +646,7 @@ body.is-wiping #coverWrap{
         coverOpen.classList.add("is-reveal");
       }, REVEAL_AT);
 
-      // ✅ arranca wipe cuando el sobre ya está yéndose
+      // arranca wipe cuando el sobre ya está yéndose
       setTimeout(() => {
         runWipeTransition({ duration: WIPE_MS });
       }, REVEAL_AT + 120);
@@ -479,6 +658,24 @@ body.is-wiping #coverWrap{
         if (welcome) welcome.style.display = "none";
       }, REVEAL_AT + 1400);
     });
+
+    /* ===== Menú móvil ===== */
+    if (navToggle && nav){
+      navToggle.addEventListener("click", () => {
+        const isOpen = nav.classList.toggle("is-open");
+        navToggle.setAttribute("aria-expanded", String(isOpen));
+      });
+
+      // cerrar al dar click en un link (móvil)
+      nav.addEventListener("click", (e) => {
+        const a = e.target.closest("a");
+        if (!a) return;
+        if (window.matchMedia("(max-width: 640px)").matches){
+          nav.classList.remove("is-open");
+          navToggle.setAttribute("aria-expanded", "false");
+        }
+      });
+    }
 
     /* ===== Burbujas (sin cambios) ===== */
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
