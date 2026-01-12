@@ -627,6 +627,13 @@ body.is-wiping #coverWrap{
         if (wrap) wrap.style.display = "none";
 
         showSite();
+
+/* ✅ IMPORTANTE: quitar el wipe que está tapando el sitio */
+const wipeEl = document.getElementById("wipe");
+if (wipeEl) wipeEl.style.display = "none";
+
+/* (Opcional) quitar la clase para que no quede “modo transición” */
+document.body.classList.remove("is-wiping");
       }, HIDE_AT);
     }
 
@@ -899,4 +906,5 @@ body.is-wiping #coverWrap{
   </script>
 </body>
 </html>
+
 
