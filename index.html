@@ -18,6 +18,9 @@
   --siteMuted: rgba(0,0,0,.60);
   --siteLine: rgba(0,0,0,.10);
   --siteMax: 1080px;
+
+  /* Slider */
+  --heroSpeed: 34s; /* más bajo = más rápido */
 }
 
 *{ box-sizing:border-box; }
@@ -241,8 +244,7 @@ body{
 }
 
 /* =========================================================
-   ✅ WIPE ROBUSTO (cross-browser): scale + feather + blanco sólido
-   ✅ Ajustado para NO “brincar” a blanco (entra al final)
+   ✅ WIPE ROBUSTO (cross-browser)
    ========================================================= */
 
 #wipe{
@@ -250,7 +252,6 @@ body{
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-
   opacity: 0;
   transform: translateZ(0);
   will-change: opacity;
@@ -365,7 +366,7 @@ body.is-wiping #coverWrap{
   -webkit-overflow-scrolling: touch;
 }
 
-/* Header como la imagen: centrado y “clean” */
+/* Header */
 .topbar{
   position: sticky;
   top: 0;
@@ -448,45 +449,123 @@ body.is-wiping #coverWrap{
   margin: 2px auto 10px;
 }
 
-/* Contenido abajo del header */
+/* Contenido */
 .site-shell{
   max-width: var(--siteMax);
   margin: 0 auto;
   padding: 0 18px 60px;
 }
 
-.section{
-  padding: 54px 4px;
-  max-width: 920px;
-  margin: 0 auto;
-  text-align:left;
-}
-.section h2{
-  font-family: "Georgia", "Times New Roman", serif;
-  font-weight: 500;
-  letter-spacing: 1.2px;
-  margin: 0 0 10px;
-}
-.section p{
-  margin: 0;
-  color: rgba(0,0,0,.60);
-  line-height: 1.6;
+/* ===========================
+   HERO SLIDER (imagenes + Letras.png centradas)
+   =========================== */
+
+.hero-slider{
+  max-width: var(--siteMax);
+  margin: 14px auto 0;
 }
 
-/* Móvil: menú colapsable como lista */
+.hero-viewport{
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #f6f6f6;
+  border: 1px solid rgba(0,0,0,.08);
+  box-shadow: 0 14px 32px rgba(0,0,0,.10);
+  isolation: isolate;
+}
+
+/* Altura del slider: responsiva */
+.hero-viewport{
+  height: clamp(260px, 52vh, 520px);
+}
+
+/* Track infinito */
+.hero-track{
+  position:absolute;
+  inset:0;
+  display:flex;
+  width: max-content;
+  height: 100%;
+  will-change: transform;
+  animation: heroMarquee var(--heroSpeed) linear infinite;
+}
+
+/* Cada slide tiene mismo ancho para que el loop sea perfecto */
+.hero-slide{
+  flex: 0 0 auto;
+  width: clamp(240px, 55vw, 560px);
+  height: 100%;
+}
+
+.hero-slide img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display:block;
+  transform: scale(1.02);
+}
+
+/* Fade suave en bordes para look “pro” */
+.hero-viewport::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:2;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,.70) 0%,
+    rgba(255,255,255,0) 12%,
+    rgba(255,255,255,0) 88%,
+    rgba(255,255,255,.70) 100%);
+}
+
+/* Overlay Letras.png centradas */
+.hero-letters{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+}
+
+.hero-letters img{
+  width: min(68%, 520px);
+  height: auto;
+  opacity: 0.98;
+  filter:
+    drop-shadow(0 18px 28px rgba(0,0,0,.32))
+    drop-shadow(0 2px 0 rgba(255,255,255,.10));
+}
+
+/* Un poquito de “glass” atrás de letras para que siempre predominen */
+.hero-letters::before{
+  content:"";
+  width: min(78%, 620px);
+  height: min(60%, 320px);
+  border-radius: 999px;
+  background: radial-gradient(circle,
+    rgba(0,0,0,.18) 0%,
+    rgba(0,0,0,.10) 35%,
+    rgba(0,0,0,0) 70%);
+  filter: blur(2px);
+  position:absolute;
+}
+
+@keyframes heroMarquee{
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); } /* como duplicamos el set, -50% = loop perfecto */
+}
+
+/* Móvil: un poquito menos alto */
 @media (max-width: 640px){
-  .nav{
-    display:none;
-    flex-direction: column;
-    gap: 8px;
-    padding: 12px 0 10px;
-  }
-  .nav.is-open{ display:flex; }
-  .nav-toggle{ display:inline-block; }
+  .hero-viewport{ height: clamp(240px, 46vh, 420px); }
+  .hero-slide{ width: clamp(220px, 76vw, 520px); }
+  .hero-letters img{ width: min(78%, 420px); }
 }
 
-
-/* placeholder sections */
+/* Secciones placeholder */
 .section{
   padding: 54px 4px;
   max-width: 920px;
@@ -505,6 +584,19 @@ body.is-wiping #coverWrap{
   line-height: 1.6;
 }
 
+/* Móvil: menú colapsable */
+@media (max-width: 640px){
+  .nav{
+    display:none;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 0 10px;
+  }
+  .nav.is-open{ display:flex; }
+  .nav-toggle{ display:inline-block; }
+}
+
+/* Reduce motion */
 @media (prefers-reduced-motion: reduce){
   .cover, .cover-open, .welcome,
   #wipe,
@@ -514,6 +606,7 @@ body.is-wiping #coverWrap{
     filter:none !important;
     transform:none !important;
   }
+  .hero-track{ animation:none !important; transform:none !important; position:relative; }
 }
   </style>
 </head>
@@ -538,24 +631,51 @@ body.is-wiping #coverWrap{
   <main id="site" aria-hidden="true">
     <div class="site-shell">
       <header class="topbar" id="home">
-  <div class="topbar-inner">
-    <div class="couple-name">VALERIA &amp; JONATAN</div>
+        <div class="topbar-inner">
+          <div class="couple-name">VALERIA &amp; JONATAN</div>
 
-    <button class="nav-toggle" id="navToggle" type="button" aria-controls="nav" aria-expanded="false">
-      Menú
-    </button>
+          <button class="nav-toggle" id="navToggle" type="button" aria-controls="nav" aria-expanded="false">
+            Menú
+          </button>
 
-    <nav class="nav" id="nav" aria-label="Navegación principal">
-      <a href="#home" class="is-active">Home</a>
-      <a href="#fecha">Fecha</a>
-      <a href="#lugar">Lugar</a>
-      <a href="#itinerario">Itinerario</a>
-      <a href="#dresscode">Dress Code</a>
-    </nav>
-  </div>
-</header>
+          <nav class="nav" id="nav" aria-label="Navegación principal">
+            <a href="#home" class="is-active">Home</a>
+            <a href="#fecha">Fecha</a>
+            <a href="#lugar">Lugar</a>
+            <a href="#itinerario">Itinerario</a>
+            <a href="#dresscode">Dress Code</a>
+          </nav>
+        </div>
+      </header>
 
-      <!-- Placeholders (para probar scroll). Luego los reemplazamos por tu contenido real -->
+      <!-- ✅ SLIDER EN MOVIMIENTO + Letras.png CENTRADO -->
+      <section class="hero-slider" aria-label="Galería en movimiento">
+        <div class="hero-viewport">
+          <div class="hero-track" aria-hidden="true">
+            <!-- SET A -->
+            <div class="hero-slide"><img src="assets/IMG1.jpg" alt=""></div>
+            <div class="hero-slide"><img src="assets/IMG2.jpg" alt=""></div>
+            <div class="hero-slide"><img src="assets/IMG3.jpg" alt=""></div>
+            <div class="hero-slide"><img src="assets/IMG4.jpg" alt=""></div>
+            <div class="hero-slide"><img src="assets/IMG5.jpg" alt=""></div>
+            <div class="hero-slide"><img src="assets/IMG6.jpg" alt=""></div>
+
+            <!-- SET B (DUPLICADO PARA LOOP PERFECTO) -->
+            <div class="hero-slide"><img src="assets/IMG1.jpg" alt=""></div>
+            <div class="hero-slide"><img src="assets/IMG2.jpg" alt=""></div>
+            <div class="hero-slide"><img src="assets/IMG3.jpg" alt=""></div>
+            <div class="hero-slide"><img src="assets/IMG4.jpg" alt=""></div>
+            <div class="hero-slide"><img src="assets/IMG5.jpg" alt=""></div>
+            <div class="hero-slide"><img src="assets/IMG6.jpg" alt=""></div>
+          </div>
+
+          <div class="hero-letters" aria-hidden="true">
+            <img src="assets/Letras.png" alt="">
+          </div>
+        </div>
+      </section>
+
+      <!-- Placeholders -->
       <section class="section" id="fecha">
         <h2>Fecha</h2>
         <p>Sección placeholder. Aquí irá el bloque de “Save the date”, fecha grande y el contador.</p>
@@ -597,12 +717,10 @@ body.is-wiping #coverWrap{
     let opened = false;
 
     function showSite(){
-      // mostrar el sitio ya en blanco
       if (site){
         site.style.display = "block";
         site.removeAttribute("aria-hidden");
       }
-      // permitir scroll en el sitio
       document.body.style.overflow = "hidden";
     }
 
@@ -610,7 +728,6 @@ body.is-wiping #coverWrap{
       document.documentElement.style.setProperty("--wipeDur", duration + "ms");
       document.body.classList.add("is-wiping");
 
-      // Ocultar “mundo” casi al final para evitar salto a blanco
       const HIDE_AT = Math.round(duration * 0.97);
 
       window.setTimeout(() => {
@@ -628,12 +745,12 @@ body.is-wiping #coverWrap{
 
         showSite();
 
-/* ✅ IMPORTANTE: quitar el wipe que está tapando el sitio */
-const wipeEl = document.getElementById("wipe");
-if (wipeEl) wipeEl.style.display = "none";
+        /* ✅ IMPORTANTE: quitar el wipe que está tapando el sitio */
+        const wipeEl = document.getElementById("wipe");
+        if (wipeEl) wipeEl.style.display = "none";
 
-/* (Opcional) quitar la clase para que no quede “modo transición” */
-document.body.classList.remove("is-wiping");
+        /* (Opcional) quitar la clase para que no quede “modo transición” */
+        document.body.classList.remove("is-wiping");
       }, HIDE_AT);
     }
 
@@ -650,11 +767,10 @@ document.body.classList.remove("is-wiping");
 
       const WELCOME_DELAY_AFTER_OPEN = 850;
 
-      // primero texto, luego sobre
-      const WELCOME_OUT_MS = 850;   // coincide con .85s
+      const WELCOME_OUT_MS = 850;
       const GAP_BEFORE_REVEAL = 180;
 
-      const WIPE_MS = 3800; // 3800–4500 si quieres más “cine”
+      const WIPE_MS = 3800;
 
       coverClosed.classList.add("is-press");
       setTimeout(() => coverClosed.classList.remove("is-press"), PRESS_MS);
@@ -665,38 +781,31 @@ document.body.classList.remove("is-wiping");
 
       const T0 = 120;
 
-      // cerrado se va
       setTimeout(() => {
         coverClosed.classList.add("is-fadeout");
       }, T0);
 
-      // abierto aparece
       setTimeout(() => {
         coverOpen.classList.add("is-show");
       }, T0 + CLOSED_FADE_MS);
 
-      // texto aparece después
       setTimeout(() => {
         if (welcome) welcome.classList.add("is-animate");
       }, T0 + CLOSED_FADE_MS + WELCOME_DELAY_AFTER_OPEN);
 
-      // texto se va
       setTimeout(() => {
         if (welcome) welcome.classList.add("is-out");
       }, T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS);
 
-      // sobre abierto se va
       const REVEAL_AT = T0 + CLOSED_FADE_MS + OPEN_FADE_MS + OPEN_HOLD_MS + WELCOME_OUT_MS + GAP_BEFORE_REVEAL;
       setTimeout(() => {
         coverOpen.classList.add("is-reveal");
       }, REVEAL_AT);
 
-      // arranca wipe cuando el sobre ya está yéndose
       setTimeout(() => {
         runWipeTransition({ duration: WIPE_MS });
       }, REVEAL_AT + 120);
 
-      // limpiar sobres (no estorban)
       setTimeout(() => {
         coverClosed.style.display = "none";
         coverOpen.style.display = "none";
@@ -711,7 +820,6 @@ document.body.classList.remove("is-wiping");
         navToggle.setAttribute("aria-expanded", String(isOpen));
       });
 
-      // cerrar al dar click en un link (móvil)
       nav.addEventListener("click", (e) => {
         const a = e.target.closest("a");
         if (!a) return;
@@ -906,5 +1014,3 @@ document.body.classList.remove("is-wiping");
   </script>
 </body>
 </html>
-
-
