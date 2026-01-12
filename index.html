@@ -365,24 +365,30 @@ body.is-wiping #coverWrap{
   -webkit-overflow-scrolling: touch;
 }
 
-.site-shell{
-  max-width: var(--siteMax);
-  margin: 0 auto;
-  padding: 28px 18px 60px;
+/* Header como la imagen: centrado y “clean” */
+.topbar{
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #fff;
+  border-bottom: 1px solid var(--siteLine);
 }
 
-.site-header{
-  text-align:center;
-  padding-top: 10px;
+.topbar-inner{
+  max-width: var(--siteMax);
+  margin: 0 auto;
+  padding: 14px 18px 10px;
+  text-align: center;
 }
 
 .couple-name{
   font-family: "Georgia", "Times New Roman", serif;
   font-weight: 400;
-  letter-spacing: 2.2px;
+  letter-spacing: 2.4px;
   text-transform: uppercase;
+  color: #222;
   font-size: clamp(22px, 3.2vw, 34px);
-  margin: 8px 0 14px;
+  margin: 4px 0 10px;
 }
 
 .nav{
@@ -391,17 +397,14 @@ body.is-wiping #coverWrap{
   justify-content:center;
   gap: 18px;
   flex-wrap: wrap;
-  padding: 10px 12px;
+  padding: 8px 0 6px;
   border-top: 1px solid var(--siteLine);
-  border-bottom: 1px solid var(--siteLine);
-  max-width: 920px;
-  margin: 0 auto;
 }
 
 .nav a{
   text-decoration:none;
-  color: var(--siteMuted);
-  font-size: 13px;
+  color: rgba(0,0,0,.62);
+  font-size: 12px;
   letter-spacing: 1px;
   text-transform: uppercase;
   padding: 8px 6px;
@@ -415,7 +418,7 @@ body.is-wiping #coverWrap{
   right: 8px;
   bottom: 4px;
   height: 1px;
-  background: rgba(0,0,0,.16);
+  background: rgba(0,0,0,.22);
   transform: scaleX(0);
   transform-origin: center;
   transition: transform .22s ease;
@@ -426,29 +429,62 @@ body.is-wiping #coverWrap{
   transform: scaleX(1);
 }
 
+.nav a.is-active{
+  color: rgba(0,0,0,.75);
+}
+.nav a.is-active::after{
+  transform: scaleX(1);
+}
+
+/* Botón menú (solo móvil) */
 .nav-toggle{
   display:none;
   border: 1px solid var(--siteLine);
   background:#fff;
   padding: 10px 12px;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: 13px;
   letter-spacing: .8px;
+  margin: 2px auto 10px;
 }
 
+/* Contenido abajo del header */
+.site-shell{
+  max-width: var(--siteMax);
+  margin: 0 auto;
+  padding: 0 18px 60px;
+}
+
+.section{
+  padding: 54px 4px;
+  max-width: 920px;
+  margin: 0 auto;
+  text-align:left;
+}
+.section h2{
+  font-family: "Georgia", "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  margin: 0 0 10px;
+}
+.section p{
+  margin: 0;
+  color: rgba(0,0,0,.60);
+  line-height: 1.6;
+}
+
+/* Móvil: menú colapsable como lista */
 @media (max-width: 640px){
   .nav{
     display:none;
     flex-direction: column;
     gap: 8px;
-    padding: 12px;
+    padding: 12px 0 10px;
   }
   .nav.is-open{ display:flex; }
-  .nav-toggle{
-    display:inline-block;
-    margin: 6px auto 10px;
-  }
+  .nav-toggle{ display:inline-block; }
 }
+
 
 /* placeholder sections */
 .section{
@@ -501,21 +537,23 @@ body.is-wiping #coverWrap{
   <!-- SITIO (PANTALLA BLANCA) -->
   <main id="site" aria-hidden="true">
     <div class="site-shell">
-      <header class="site-header" id="home">
-        <div class="couple-name">VALERIA &amp; JONATAN</div>
+      <header class="topbar" id="home">
+  <div class="topbar-inner">
+    <div class="couple-name">VALERIA &amp; JONATAN</div>
 
-        <button class="nav-toggle" id="navToggle" type="button" aria-controls="nav" aria-expanded="false">
-          Menú
-        </button>
+    <button class="nav-toggle" id="navToggle" type="button" aria-controls="nav" aria-expanded="false">
+      Menú
+    </button>
 
-        <nav class="nav" id="nav">
-          <a href="#home">Home</a>
-          <a href="#fecha">Fecha</a>
-          <a href="#lugar">Lugar</a>
-          <a href="#itinerario">Itinerario</a>
-          <a href="#dresscode">Dress Code</a>
-        </nav>
-      </header>
+    <nav class="nav" id="nav" aria-label="Navegación principal">
+      <a href="#home" class="is-active">Home</a>
+      <a href="#fecha">Fecha</a>
+      <a href="#lugar">Lugar</a>
+      <a href="#itinerario">Itinerario</a>
+      <a href="#dresscode">Dress Code</a>
+    </nav>
+  </div>
+</header>
 
       <!-- Placeholders (para probar scroll). Luego los reemplazamos por tu contenido real -->
       <section class="section" id="fecha">
@@ -861,3 +899,4 @@ body.is-wiping #coverWrap{
   </script>
 </body>
 </html>
+
