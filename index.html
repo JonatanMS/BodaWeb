@@ -232,62 +232,91 @@ body{
 }
 
 /* =========================================================
-   ✅ TRANSICIÓN FLUIDA: IRIS / RADIAL WIPE (UNA SOLA CAPA)
-   ✅ FIX: último “pedacito” -> exterior se vuelve blanco gradual
+   ✅ WIPE ROBUSTO (cross-browser): scale + feather + blanco sólido
+   ✅ FIX “pedacito”: capa full-white entra antes del final
    ========================================================= */
-
-/* ✅ Propiedades animables */
-@property --wipeR {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 90px;
-}
-@property --wipeOuterA {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
-@property --wipeSoft {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 160px;
-}
 
 #wipe{
   position: fixed;
   inset: 0;
   z-index: 9999;
   pointer-events: none;
+
   opacity: 0;
-
-  /* origen: esquina superior izquierda */
-  --wipeX: 0px;
-  --wipeY: 0px;
-
-  /* radio + suavidad */
-  --wipeR: 90px;
-  --wipeSoft: 160px;
-
-  /* opacidad del blanco exterior (0->1 al final) */
-  --wipeOuterA: 0;
-
-  /* ✅ el exterior deja de ser transparente de forma PROGRESIVA */
-  background: radial-gradient(
-    circle at var(--wipeX) var(--wipeY),
-    rgba(255,255,255,1) 0px,
-    rgba(255,255,255,1) calc(var(--wipeR) - var(--wipeSoft)),
-    rgba(255,255,255,var(--wipeOuterA)) var(--wipeR),
-    rgba(255,255,255,var(--wipeOuterA)) 200%
-  );
-
-  filter: blur(0px);
-  will-change: opacity, filter, background;
+  transform: translateZ(0);
+  will-change: opacity;
 }
 
-/* activación */
+#wipe::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+
+  width: 300vmax;
+  height: 300vmax;
+
+  background: radial-gradient(
+    circle at 0 0,
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,1) 62%,
+    rgba(255,255,255,.95) 66%,
+    rgba(255,255,255,0) 74%,
+    rgba(255,255,255,0) 100%
+  );
+
+  transform-origin: 0 0;
+  transform: scale(0.02);
+  filter: blur(0px);
+
+  will-change: transform, filter;
+}
+
+#wipe::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:#fff;
+  opacity:0;
+  will-change: opacity;
+}
+
 body.is-wiping #wipe{
   opacity: 1;
-  animation: wipeGrow var(--wipeDur, 3600ms) var(--easeWarm) forwards;
+}
+
+body.is-wiping #wipe::before{
+  animation: wipeExpand var(--wipeDur, 3600ms) var(--easeWarm) forwards;
+}
+body.is-wiping #wipe::after{
+  animation: wipeFullWhite var(--wipeDur, 3600ms) var(--easeWarm) forwards;
+}
+
+@keyframes wipeExpand{
+  0%{
+    transform: scale(0.02);
+    filter: blur(0px);
+  }
+  55%{
+    transform: scale(0.55);
+    filter: blur(10px);
+  }
+  85%{
+    transform: scale(0.95);
+    filter: blur(14px);
+  }
+  100%{
+    transform: scale(1.08);
+    filter: blur(18px);
+  }
+}
+
+@keyframes wipeFullWhite{
+  0%   { opacity:0; }
+  55%  { opacity:0; }
+  78%  { opacity:0.70; }
+  90%  { opacity:1; }
+  100% { opacity:1; }
 }
 
 /* blur progresivo del “mundo” mientras entra el wipe */
@@ -312,34 +341,6 @@ body.is-wiping .bg-base{
 body.is-wiping #coverWrap{
   filter: blur(14px);
   opacity: .15;
-}
-
-/* ✅ Animación: crece + “cierra” exterior hacia blanco */
-@keyframes wipeGrow{
-  0%{
-    --wipeR: 90px;
-    --wipeOuterA: 0;
-    --wipeSoft: 160px;
-    filter: blur(0px);
-  }
-  55%{
-    --wipeR: 85vmax;
-    --wipeOuterA: 0;
-    --wipeSoft: 200px;
-    filter: blur(10px);
-  }
-  85%{
-    --wipeR: 150vmax;
-    --wipeOuterA: .55;
-    --wipeSoft: 240px;
-    filter: blur(14px);
-  }
-  100%{
-    --wipeR: 260vmax;   /* ✅ más grande para cualquier pantalla */
-    --wipeOuterA: 1;    /* ✅ full blanco, cero transparencia */
-    --wipeSoft: 260px;
-    filter: blur(18px);
-  }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -381,23 +382,17 @@ body.is-wiping #coverWrap{
     const music = document.getElementById("bg-music");
     const hint  = document.getElementById("hint");
     const welcome = document.getElementById("welcome");
-    const wipe = document.getElementById("wipe");
 
     let opened = false;
 
     function runWipeTransition({ duration = 3600 } = {}) {
       // duración global para blur + wipe
       document.documentElement.style.setProperty("--wipeDur", duration + "ms");
-
-      // origen top-left consistente
-      if (wipe){
-        wipe.style.setProperty("--wipeX", "0px");
-        wipe.style.setProperty("--wipeY", "0px");
-      }
-
       document.body.classList.add("is-wiping");
 
-      // al terminar: dejar todo BLANCO (y listo para mostrar tu contenido real)
+      // Para que se vea blanco “completo” antes (y no hasta el último ms)
+      const HIDE_AT = Math.round(duration * 0.86);
+
       window.setTimeout(() => {
         document.body.style.background = "#fff";
 
@@ -414,7 +409,7 @@ body.is-wiping #coverWrap{
         // IMPORTANTE: NO tocamos la música, sigue.
         // Aquí luego metes tu segunda "página" / contenido:
         // document.getElementById("contenido").style.display = "block";
-      }, duration);
+      }, HIDE_AT);
     }
 
     coverClosed.addEventListener("click", async () => {
